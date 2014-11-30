@@ -1,5 +1,10 @@
 [package]
-
 name = "neovim-rs"
 version = "0.0.1"
 authors = ["oakes <zsoakes@gmail.com>"]
+build = "build.rs"
+
+[lib]
+name = "neovim-rs"
+crate_type = ["rlib"]
+path = "src/neovim.rs"
