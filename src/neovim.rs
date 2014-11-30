@@ -1,12 +1,14 @@
-#![crate_name = "neovim-rs"]
+#![crate_name = "neovim"]
 #![crate_type = "lib"]
 #![crate_type = "rlib"]
+#![feature(globs)]
 
 extern crate libc;
 
-//use libc::{c_int, c_char, c_uchar, c_float, c_uint, c_double, c_long, c_short, c_void, c_ulong};
-use libc::{c_uchar};
+use std::str;
 
-extern "C" {
-    pub fn path_tail (fname: *mut c_uchar) -> *mut c_uchar;
+pub mod ffi;
+
+pub fn path_tail(fname: &str) -> &str {
+    unsafe { str::from_c_str(ffi::path_tail(fname.to_c_str().as_mut_ptr() as *mut u8) as *const i8) }
 }

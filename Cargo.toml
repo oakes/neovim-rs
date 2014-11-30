@@ -5,6 +5,6 @@ authors = ["oakes <zsoakes@gmail.com>"]
 build = "build.rs"
 
 [lib]
-name = "neovim-rs"
+name = "neovim"
 crate_type = ["rlib"]
 path = "src/neovim.rs"
