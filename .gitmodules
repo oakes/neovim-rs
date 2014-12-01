@@ -1,3 +1,3 @@
 [submodule "neovim"]
 	path = neovim
-	url = https://github.com/neovim/neovim.git
+	url = git@github.com:oakes/neovim.git
