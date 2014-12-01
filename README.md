@@ -18,7 +18,7 @@ yum install autoconf automake cmake gcc gcc-c++ libtool ncurses-devel pkgconfig
 cargo build
 ```
 
-### OSX (homebrew)
+### OS X (homebrew)
 
 ```Shell
 brew install libtool automake cmake pkg-config
