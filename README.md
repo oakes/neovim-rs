@@ -1,6 +1,6 @@
 ## Introduction
 
-A Neovim wrapper for Rust.
+A Neovim wrapper for Rust, allowing you to embed the text editor into a program and use it as a library.
 
 ## Build Instructions
 
