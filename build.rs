@@ -6,9 +6,8 @@ fn main() {
     let nvim_dir = Path::new(curr_dir).join("neovim");
     Command::new("make")
         .cwd(&nvim_dir)
-        .env("SKIP_EXEC", "TRUE")
-        .env("SKIP_UNITTEST", "TRUE")
         .env("MAKE_LIB", "TRUE")
+        .env("SKIP_UNITTEST", "TRUE")
         .status()
         .unwrap();
 
