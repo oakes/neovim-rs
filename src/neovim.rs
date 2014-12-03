@@ -5,10 +5,11 @@
 
 extern crate libc;
 
-use std::str;
-
 pub mod ffi;
 
-pub fn path_tail(fname: &str) -> &str {
-    unsafe { str::from_c_str(ffi::path_tail(fname.to_c_str().as_mut_ptr() as *mut u8) as *const i8) }
+pub fn nvim_main() {
+    unsafe {
+        let mut args = ["nvim".to_c_str().as_mut_ptr()];
+        ffi::nvim_main(args.len() as i32, args.as_mut_ptr());
+    }
 }
