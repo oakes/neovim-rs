@@ -5,7 +5,13 @@
 
 extern crate libc;
 
-pub mod ffi;
+mod ffi {
+    use libc::{c_int, c_char};
+
+    extern "C" {
+        pub fn nvim_main (argc: c_int, argv: *mut *mut c_char);
+    }
+}
 
 pub fn nvim_main() {
     unsafe {
