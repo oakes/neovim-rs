@@ -4,6 +4,26 @@
 
 extern crate libc;
 
+#[cfg(target_os="macos")]
+mod platform {
+    #[link(name = "nvim")]
+    #[link(name = "uv")]
+    #[link(name = "msgpack")]
+    #[link(name = "curses")]
+    #[link(name = "iconv")]
+    extern{}
+}
+
+#[doc(hidden)]
+#[cfg(target_os="linux")]
+mod platform {
+    #[link(name = "nvim")]
+    #[link(name = "uv")]
+    #[link(name = "msgpack")]
+    #[link(name = "curses")]
+    extern{}
+}
+
 mod ffi {
     use libc::{c_char, c_int};
 
