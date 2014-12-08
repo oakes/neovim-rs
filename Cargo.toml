@@ -7,4 +7,4 @@ build = "build.rs"
 [lib]
 name = "neovim"
 crate_type = ["rlib"]
-path = "src/neovim.rs"
+path = "src/lib.rs"
