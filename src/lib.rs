@@ -23,6 +23,15 @@ mod platform {
     extern{}
 }
 
+#[cfg(target_os="windows")]
+mod platform {
+    #[link(name = "nvim")]
+    #[link(name = "uv")]
+    #[link(name = "msgpack")]
+    #[link(name = "curses")]
+    extern{}
+}
+
 mod ffi {
     pub use libc::{c_char, c_int, uint64_t};
 
