@@ -14,7 +14,6 @@ mod platform {
     extern{}
 }
 
-#[doc(hidden)]
 #[cfg(target_os="linux")]
 mod platform {
     #[link(name = "nvim")]
