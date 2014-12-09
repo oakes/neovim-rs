@@ -5,7 +5,7 @@ fn main() {
     let curr_dir = Path::new(os::getenv("CARGO_MANIFEST_DIR").unwrap());
     Command::new("git").arg("submodule").arg("update").arg("--init").cwd(&curr_dir).status().unwrap();
 
-    let nvim_dir = Path::new(curr_dir).join("neovim");
+    let nvim_dir = curr_dir.join("neovim");
     Command::new("make").arg("libnvim").cwd(&nvim_dir).status().unwrap();
 
     let nvim_lib_dir = nvim_dir.join_many(&["build", "src", "nvim"]);
