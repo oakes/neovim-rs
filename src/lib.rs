@@ -5,6 +5,7 @@
 extern crate libc;
 
 use std::c_str::CString;
+use std::string::String;
 use std::vec::Vec;
 
 #[cfg(target_os="macos")]
@@ -39,18 +40,10 @@ mod ffi {
     pub use libc::{c_char, c_int, uint64_t};
 
     extern "C" {
-        pub fn nvim_main (argc: c_int, argv: *const *const c_char) -> c_int;
         pub fn channel_from_fds (read_fd: c_int, write_fd: c_int) -> uint64_t;
         pub fn channel_subscribe (id: uint64_t, event: *const c_char);
+        pub fn nvim_main (argc: c_int, argv: *const *const c_char) -> c_int;
     }
-}
-
-pub fn nvim_main(args: &[&str]) -> i32 {
-    let v: Vec<CString> = args.iter().map(|s| s.to_c_str()).collect();
-    let vp: Vec<*const ffi::c_char> = v.iter().map(|s| s.as_ptr()).collect();
-    let p_vp: *const *const ffi::c_char = vp.as_ptr();
-
-    unsafe { ffi::nvim_main(vp.len() as i32, p_vp) }
 }
 
 pub struct Channel {
@@ -67,4 +60,12 @@ impl Channel {
     pub fn subscribe(&mut self, event: &str) {
         unsafe { ffi::channel_subscribe(self.id, event.to_c_str().as_ptr()) }
     }
+}
+
+pub fn nvim_main(args: Vec<String>) -> i32 {
+    let v: Vec<CString> = args.iter().map(|s| s.as_slice().to_c_str()).collect();
+    let vp: Vec<*const ffi::c_char> = v.iter().map(|s| s.as_ptr()).collect();
+    let p_vp: *const *const ffi::c_char = vp.as_ptr();
+
+    unsafe { ffi::nvim_main(vp.len() as i32, p_vp) }
 }
