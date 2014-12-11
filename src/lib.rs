@@ -51,7 +51,7 @@ pub struct Channel {
 }
 
 impl Channel {
-    pub fn new(read_fd: i32, write_fd: i32) -> Channel {
+    pub fn new_with_fds(read_fd: i32, write_fd: i32) -> Channel {
         Channel {
             id: unsafe { ffi::channel_from_fds(read_fd, write_fd) }
         }
@@ -62,10 +62,15 @@ impl Channel {
     }
 }
 
-pub fn nvim_main(args: Vec<String>) -> i32 {
-    let v: Vec<CString> = args.iter().map(|s| s.as_slice().to_c_str()).collect();
+pub fn run_with_slice(args: &[&str]) -> i32 {
+    let v: Vec<CString> = args.iter().map(|s| s.to_c_str()).collect();
     let vp: Vec<*const ffi::c_char> = v.iter().map(|s| s.as_ptr()).collect();
     let p_vp: *const *const ffi::c_char = vp.as_ptr();
 
     unsafe { ffi::nvim_main(vp.len() as i32, p_vp) }
+}
+
+pub fn run_with_vec(args: Vec<String>) -> i32 {
+    let v: Vec<&str> = args.iter().map(|s| s.as_slice()).collect();
+    run_with_slice(v.as_slice())
 }
