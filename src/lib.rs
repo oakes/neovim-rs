@@ -4,6 +4,9 @@
 
 extern crate libc;
 
+use std::c_str::CString;
+use std::vec::Vec;
+
 #[cfg(target_os="macos")]
 mod platform {
     #[link(name = "nvim")]
@@ -42,11 +45,12 @@ mod ffi {
     }
 }
 
-pub fn nvim_main() -> i32 {
-    unsafe {
-        let args = ["nvim".to_c_str().as_ptr()];
-        ffi::nvim_main(args.len() as i32, args.as_ptr())
-    }
+pub fn nvim_main(args: &[&str]) -> i32 {
+    let v: Vec<CString> = args.iter().map(|s| s.to_c_str()).collect();
+    let vp: Vec<*const ffi::c_char> = v.iter().map(|s| s.as_ptr()).collect();
+    let p_vp: *const *const ffi::c_char = vp.as_ptr();
+
+    unsafe { ffi::nvim_main(vp.len() as i32, p_vp) }
 }
 
 pub struct Channel {
