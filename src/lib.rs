@@ -77,7 +77,6 @@ pub fn run_with_callback(
     unsafe { ffi::nvim_main(vp.len() as i32, p_vp, callback, read_fs, write_fs) }
 }
 
-pub fn run(args: Vec<String>) -> i32
-{
+pub fn run(args: Vec<String>) -> i32 {
     run_with_callback(args, None, -1, -1)
 }
