@@ -48,6 +48,7 @@ mod ffi {
     }
 }
 
+#[deriving(Copy)]
 pub struct Channel {
     id: ffi::uint64_t
 }
