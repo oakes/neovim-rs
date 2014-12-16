@@ -37,47 +37,23 @@ mod platform {
 }
 
 mod ffi {
-    pub use libc::{c_char, c_int, c_void, uint64_t};
+    pub use libc::{c_char, c_int};
 
     extern "C" {
-        pub fn channel_from_fds (read_fd: c_int, write_fd: c_int) -> uint64_t;
-        pub fn channel_subscribe (id: uint64_t, event: *const c_char);
         pub fn nvim_main (argc: c_int, argv: *const *const c_char,
-                          callback: Option<extern "C" fn(c_int, c_int)>,
-                          read_fs: c_int, write_fs: c_int) -> c_int;
+                          read_fd: c_int,
+                          write_fd: c_int) -> c_int;
     }
 }
 
-#[deriving(Copy)]
-pub struct Channel {
-    id: ffi::uint64_t
-}
-
-impl Channel {
-    pub fn new_with_fds(read_fd: i32, write_fd: i32) -> Channel {
-        Channel {
-            id: unsafe { ffi::channel_from_fds(read_fd, write_fd) }
-        }
-    }
-
-    pub fn subscribe(&mut self, event: &str) {
-        unsafe { ffi::channel_subscribe(self.id, event.to_c_str().as_ptr()) }
-    }
-}
-
-pub fn run_with_callback(
-    args: Vec<String>,
-    callback: Option<extern "C" fn(i32, i32)>,
-    read_fs: i32,
-    write_fs: i32) -> i32
-{
+pub fn run_with_fds(args: Vec<String>, read_fd: i32, write_fd: i32) -> i32 {
     let v: Vec<CString> = args.iter().map(|s| s.as_slice().to_c_str()).collect();
     let vp: Vec<*const ffi::c_char> = v.iter().map(|s| s.as_ptr()).collect();
     let p_vp: *const *const ffi::c_char = vp.as_ptr();
 
-    unsafe { ffi::nvim_main(vp.len() as i32, p_vp, callback, read_fs, write_fs) }
+    unsafe { ffi::nvim_main(vp.len() as i32, p_vp, read_fd, write_fd) }
 }
 
 pub fn run(args: Vec<String>) -> i32 {
-    run_with_callback(args, None, -1, -1)
+    run_with_fds(args, -1, -1)
 }
