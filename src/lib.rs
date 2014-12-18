@@ -83,15 +83,22 @@ impl Request {
         Request {
             id: id,
             method: method,
-            arguments: unsafe { ffi::vim_array_new() }
+            arguments: ::std::ptr::null_mut()
+        }
+    }
+
+    fn check_arguments(&mut self) {
+        if self.arguments.is_null() {
+            self.arguments = unsafe { ffi::vim_array_new() };
         }
     }
 
     pub fn add_int(&mut self, val: i64) {
+        self.check_arguments();
         unsafe { ffi::vim_array_add_int(val, self.arguments) }
     }
 
-    pub fn serialize(&self) -> String {
+    pub fn serialize(&mut self) -> String {
         unsafe {
             let buf = ffi::vim_sbuffer_new();
             ffi::vim_serialize_request(self.id,
@@ -101,6 +108,7 @@ impl Request {
             let s = String::from_raw_buf_len((*buf).data as *const u8, (*buf).size as uint);
             ffi::vim_sbuffer_free(buf);
             ffi::vim_array_free(self.arguments);
+            self.arguments = ::std::ptr::null_mut();
             s
         }
     }
