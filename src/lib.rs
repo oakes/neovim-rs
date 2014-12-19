@@ -108,7 +108,11 @@ impl Array {
 
     pub fn add_string(&mut self, val: &str) {
         unsafe {
-            let vim_str = ffi::C_String {data: val.as_ptr() as *const i8, size: val.len() as u64};
+            // we need to copy the string into memory not managed by Rust,
+            // so api_free_array can clear it
+            let ptr = ffi::malloc(val.len() as u64);
+            ::std::ptr::copy_memory(ptr, val.as_ptr() as *const ffi::c_void, val.len());
+            let vim_str = ffi::C_String {data: ptr as *const i8, size: val.len() as u64};
             ffi::vim_array_add_string(vim_str, &mut self.value)
         }
     }

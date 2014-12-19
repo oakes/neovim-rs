@@ -1,4 +1,5 @@
-pub use libc::{c_char, c_double, c_int, int64_t, uint64_t};
+pub use libc::{c_char, c_double, c_int, c_void, int64_t, uint64_t};
+pub use libc::funcs::c95::stdlib::malloc;
 pub use libc::types::os::arch::c95::size_t;
 
 #[repr(C)]
