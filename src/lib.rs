@@ -184,6 +184,14 @@ impl Array {
         self.pointer = ::std::ptr::null_mut();
     }
 
+    pub fn len(&self) -> u64 {
+        if !self.pointer.is_null() {
+            unsafe { (*self.pointer).size }
+        } else {
+            0
+        }
+    }
+
     #[doc(hidden)]
     pub fn get_pointer(&self) -> *mut ffi::C_Array {
         self.pointer
