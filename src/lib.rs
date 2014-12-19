@@ -115,6 +115,17 @@ pub fn run(args: Vec<String>) -> i32 {
     run_with_fds(args, -1, -1)
 }
 
+pub fn serialize_request(id: u64, method: &'static str, args: &Array) -> String {
+    unsafe {
+        let buf = ffi::vim_msgpack_new();
+        ffi::vim_serialize_request(id, ffi::C_String {data: method.to_c_str().as_ptr(), size: method.len() as u64},
+                                   *args.get_pointer(), buf);
+        let s = String::from_raw_buf_len((*buf).data as *const u8, (*buf).size as uint);
+        ffi::vim_msgpack_free(buf);
+        s
+    }
+}
+
 #[deriving(Copy)]
 pub struct Array {
     pointer: *mut ffi::C_Array
@@ -179,16 +190,6 @@ impl Array {
         unsafe { ffi::vim_array_add_dictionary(val, self.pointer) }
     }
 
-    pub fn serialize_request(&mut self, id: u64, method: &'static str) -> String {
-        unsafe {
-            let buf = ffi::vim_msgpack_new();
-            ffi::vim_serialize_request(id, ffi::C_String {data: method.to_c_str().as_ptr(), size: method.len() as u64}, *self.pointer, buf);
-            let s = String::from_raw_buf_len((*buf).data as *const u8, (*buf).size as uint);
-            ffi::vim_msgpack_free(buf);
-            s
-        }
-    }
-
     pub fn clear(&mut self) {
         if !self.pointer.is_null() {
             unsafe { ffi::vim_array_free(self.pointer) };
@@ -231,8 +232,8 @@ impl Drop for Array {
 
 #[test]
 fn test_request() {
-    let mut a = Array::new();
-    a.add_integer(80);
-    a.add_integer(24);
-    println!("{}", a.serialize_request(1, "attach_ui"));
+    let mut args = Array::new();
+    args.add_integer(80);
+    args.add_integer(24);
+    println!("{}", serialize_request(1, "attach_ui", &args));
 }
