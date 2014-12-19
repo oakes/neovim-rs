@@ -173,10 +173,15 @@ impl Array {
             ffi::vim_serialize_request(id, ffi::C_String {data: method.to_c_str().as_ptr(), size: method.len() as u64}, *self.pointer, buf);
             let s = String::from_raw_buf_len((*buf).data as *const u8, (*buf).size as uint);
             ffi::vim_msgpack_free(buf);
-            ffi::vim_array_free(self.pointer);
-            self.pointer = ::std::ptr::null_mut();
             s
         }
+    }
+
+    pub fn clear(&mut self) {
+        if !self.pointer.is_null() {
+            unsafe { ffi::vim_array_free(self.pointer) };
+        }
+        self.pointer = ::std::ptr::null_mut();
     }
 
     #[doc(hidden)]
@@ -200,10 +205,7 @@ impl Array {
 
 impl Drop for Array {
     fn drop(&mut self) {
-        if !self.pointer.is_null() {
-            unsafe { ffi::vim_array_free(self.pointer) };
-        }
-        self.pointer = ::std::ptr::null_mut();
+        self.clear();
     }
 }
 
