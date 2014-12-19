@@ -54,8 +54,7 @@ pub fn run(args: Vec<String>) -> i32 {
 pub fn serialize_request(id: u64, method: &'static str, args: &Array) -> String {
     unsafe {
         let buf = ffi::vim_msgpack_new();
-        let c_str = method.to_c_str();
-        let vim_str = ffi::C_String {data: c_str.as_ptr(), size: c_str.len() as u64};
+        let vim_str = ffi::C_String {data: method.as_ptr() as *const i8, size: method.len() as u64};
         ffi::vim_serialize_request(id, vim_str, *args.get_pointer(), buf);
         let s = String::from_raw_buf_len((*buf).data as *const u8, (*buf).size as uint);
         ffi::vim_msgpack_free(buf);
