@@ -103,6 +103,18 @@ mod ffi {
     }
 }
 
+pub fn run_with_fds(args: Vec<String>, read_fd: i32, write_fd: i32) -> i32 {
+    let v: Vec<CString> = args.iter().map(|s| s.as_slice().to_c_str()).collect();
+    let vp: Vec<*const ffi::c_char> = v.iter().map(|s| s.as_ptr()).collect();
+    let p_vp: *const *const ffi::c_char = vp.as_ptr();
+
+    unsafe { ffi::nvim_main(vp.len() as i32, p_vp, read_fd, write_fd) }
+}
+
+pub fn run(args: Vec<String>) -> i32 {
+    run_with_fds(args, -1, -1)
+}
+
 #[deriving(Copy)]
 pub struct Array {
     pointer: *mut ffi::C_Array
@@ -223,16 +235,4 @@ fn test_request() {
     a.add_integer(80);
     a.add_integer(24);
     println!("{}", a.serialize_request(1, "attach_ui"));
-}
-
-pub fn run_with_fds(args: Vec<String>, read_fd: i32, write_fd: i32) -> i32 {
-    let v: Vec<CString> = args.iter().map(|s| s.as_slice().to_c_str()).collect();
-    let vp: Vec<*const ffi::c_char> = v.iter().map(|s| s.as_ptr()).collect();
-    let p_vp: *const *const ffi::c_char = vp.as_ptr();
-
-    unsafe { ffi::nvim_main(vp.len() as i32, p_vp, read_fd, write_fd) }
-}
-
-pub fn run(args: Vec<String>) -> i32 {
-    run_with_fds(args, -1, -1)
 }
