@@ -52,8 +52,7 @@ extern "C" {
                       argv: *const *const c_char,
                       read_fd: c_int,
                       write_fd: c_int) -> c_int;
-    pub fn vim_array_new () -> *mut C_Array;
-    pub fn vim_array_free (arr: *mut C_Array);
+    pub fn api_free_array (arr: C_Array);
     pub fn vim_array_add_buffer (val: Buffer, arr: *mut C_Array);
     pub fn vim_array_add_window (val: Window, arr: *mut C_Array);
     pub fn vim_array_add_tabpage (val: Tabpage, arr: *mut C_Array);

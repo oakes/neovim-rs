@@ -55,7 +55,7 @@ pub fn serialize_request(id: u64, method: &'static str, args: &Array) -> String 
     unsafe {
         let buf = ffi::vim_msgpack_new();
         let vim_str = ffi::C_String {data: method.as_ptr() as *const i8, size: method.len() as u64};
-        ffi::vim_serialize_request(id, vim_str, *args.get_pointer(), buf);
+        ffi::vim_serialize_request(id, vim_str, args.get_value(), buf);
         let s = String::from_raw_buf_len((*buf).data as *const u8, (*buf).size as uint);
         ffi::vim_msgpack_free(buf);
         s
@@ -64,106 +64,83 @@ pub fn serialize_request(id: u64, method: &'static str, args: &Array) -> String 
 
 #[deriving(Copy)]
 pub struct Array {
-    pointer: *mut ffi::C_Array
+    value: ffi::C_Array
 }
 
 impl Array {
     pub fn new() -> Array {
         Array {
-            pointer: ::std::ptr::null_mut()
+            value: ffi::C_Array {
+                items: ::std::ptr::null_mut(),
+                size: 0,
+                capacity: 0,
+            }
         }
     }
 
     pub fn add_buffer(&mut self, val: ffi::Buffer) {
-        self.check_pointer();
-        unsafe { ffi::vim_array_add_buffer(val, self.pointer) }
+        unsafe { ffi::vim_array_add_buffer(val, &mut self.value) }
     }
 
     pub fn add_window(&mut self, val: ffi::Window) {
-        self.check_pointer();
-        unsafe { ffi::vim_array_add_window(val, self.pointer) }
+        unsafe { ffi::vim_array_add_window(val, &mut self.value) }
     }
 
     pub fn add_tabpage(&mut self, val: ffi::Tabpage) {
-        self.check_pointer();
-        unsafe { ffi::vim_array_add_tabpage(val, self.pointer) }
+        unsafe { ffi::vim_array_add_tabpage(val, &mut self.value) }
     }
 
     pub fn add_nil(&mut self) {
-        self.check_pointer();
-        unsafe { ffi::vim_array_add_nil(self.pointer) }
+        unsafe { ffi::vim_array_add_nil(&mut self.value) }
     }
 
     pub fn add_boolean(&mut self, val: ffi::Boolean) {
-        self.check_pointer();
-        unsafe { ffi::vim_array_add_boolean(val, self.pointer) }
+        unsafe { ffi::vim_array_add_boolean(val, &mut self.value) }
     }
 
     pub fn add_integer(&mut self, val: ffi::Integer) {
-        self.check_pointer();
-        unsafe { ffi::vim_array_add_integer(val, self.pointer) }
+        unsafe { ffi::vim_array_add_integer(val, &mut self.value) }
     }
 
     pub fn add_float(&mut self, val: ffi::Float) {
-        self.check_pointer();
-        unsafe { ffi::vim_array_add_float(val, self.pointer) }
+        unsafe { ffi::vim_array_add_float(val, &mut self.value) }
     }
 
     pub fn add_string(&mut self, val: &str) {
-        self.check_pointer();
         unsafe {
             let vim_str = ffi::C_String {data: val.as_ptr() as *const i8, size: val.len() as u64};
-            ffi::vim_array_add_string(vim_str, self.pointer)
+            ffi::vim_array_add_string(vim_str, &mut self.value)
         }
     }
 
     pub fn add_array(&mut self, val: Array) {
-        self.check_pointer();
-        unsafe { ffi::vim_array_add_array(*val.get_pointer(), self.pointer) }
+        unsafe { ffi::vim_array_add_array(val.get_value(), &mut self.value) }
     }
 
     pub fn add_dictionary(&mut self, val: ffi::C_Dictionary) {
-        self.check_pointer();
-        unsafe { ffi::vim_array_add_dictionary(val, self.pointer) }
-    }
-
-    pub fn clear(&mut self) {
-        if !self.pointer.is_null() {
-            unsafe { ffi::vim_array_free(self.pointer) };
-        }
-        self.pointer = ::std::ptr::null_mut();
+        unsafe { ffi::vim_array_add_dictionary(val, &mut self.value) }
     }
 
     pub fn len(&self) -> u64 {
-        if !self.pointer.is_null() {
-            unsafe { (*self.pointer).size }
-        } else {
-            0
-        }
+        self.value.size
     }
 
     #[doc(hidden)]
-    pub fn get_pointer(&self) -> *mut ffi::C_Array {
-        self.pointer
+    pub fn get_value(&self) -> ffi::C_Array {
+        self.value
     }
 
     #[doc(hidden)]
-    pub fn wrap_pointer(c_array: *mut ffi::C_Array) -> Array {
+    pub fn wrap_value(c_array: ffi::C_Array) -> Array {
         Array {
-            pointer: c_array
-        }
-    }
-
-    fn check_pointer(&mut self) {
-        if self.pointer.is_null() {
-            self.pointer = unsafe { ffi::vim_array_new() };
+            value: c_array
         }
     }
 }
 
 impl Drop for Array {
     fn drop(&mut self) {
-        self.clear();
+        unsafe { ffi::api_free_array(self.value) };
     }
 }
 
