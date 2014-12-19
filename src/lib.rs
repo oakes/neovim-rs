@@ -113,8 +113,7 @@ impl Array {
     pub fn add_string(&mut self, val: &str) {
         self.check_pointer();
         unsafe {
-            let c_str = val.to_c_str();
-            let vim_str = ffi::C_String {data: c_str.as_ptr(), size: c_str.len() as u64};
+            let vim_str = ffi::C_String {data: val.as_ptr() as *const i8, size: val.len() as u64};
             ffi::vim_array_add_string(vim_str, self.pointer)
         }
     }
@@ -174,5 +173,6 @@ fn test_request() {
     let mut args = Array::new();
     args.add_integer(80);
     args.add_integer(24);
+    args.add_string("hello");
     println!("{}", serialize_request(1, "attach_ui", &args));
 }
