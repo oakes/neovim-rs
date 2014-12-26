@@ -66,6 +66,7 @@ extern "C" {
     pub fn vim_array_add_dictionary (val: C_Dictionary, arr: *mut C_Array);
     pub fn vim_msgpack_new () -> *mut C_msgpack_sbuffer;
     pub fn vim_msgpack_free (buf: *mut C_msgpack_sbuffer);
+    pub fn vim_msgpack_parse (message: C_String, arr: *mut C_Array);
     pub fn vim_serialize_request (request_id: uint64_t,
                                   method: C_String,
                                   args: C_Array,

@@ -51,7 +51,7 @@ pub fn run(args: Vec<String>) -> i32 {
     run_with_fds(args, -1, -1)
 }
 
-pub fn serialize_request(id: u64, method: &'static str, args: &Array) -> String {
+pub fn serialize_message(id: u64, method: &'static str, args: &Array) -> String {
     unsafe {
         let buf = ffi::vim_msgpack_new();
         let vim_str = ffi::C_String {data: method.as_ptr() as *const i8, size: method.len() as u64};
@@ -59,6 +59,18 @@ pub fn serialize_request(id: u64, method: &'static str, args: &Array) -> String 
         let s = String::from_raw_buf_len((*buf).data as *const u8, (*buf).size as uint);
         ffi::vim_msgpack_free(buf);
         s
+    }
+}
+
+pub fn deserialize_message(message: &String) -> Array {
+    unsafe {
+        let mut arr_raw = Array::new().get_value();
+        let s = ffi::C_String {
+            data: message.as_slice().as_ptr() as *const i8,
+            size: message.len() as u64
+        };
+        ffi::vim_msgpack_parse(s, &mut arr_raw);
+        Array::wrap_value(arr_raw)
     }
 }
 
@@ -154,5 +166,7 @@ fn test_request() {
     args.add_integer(80);
     args.add_integer(24);
     args.add_string("hello");
-    println!("{}", serialize_request(1, "attach_ui", &args));
+    let msg = serialize_message(1, "attach_ui", &args);
+    let arr = deserialize_message(&msg);
+    println!("LENGTH: {}", arr.len());
 }
