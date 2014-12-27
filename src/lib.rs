@@ -90,15 +90,15 @@ impl Array {
         }
     }
 
-    pub fn add_buffer(&mut self, val: ffi::Buffer) {
+    pub fn add_buffer(&mut self, val: ffi::C_Buffer) {
         unsafe { ffi::vim_array_add_buffer(val, &mut self.value) }
     }
 
-    pub fn add_window(&mut self, val: ffi::Window) {
+    pub fn add_window(&mut self, val: ffi::C_Window) {
         unsafe { ffi::vim_array_add_window(val, &mut self.value) }
     }
 
-    pub fn add_tabpage(&mut self, val: ffi::Tabpage) {
+    pub fn add_tabpage(&mut self, val: ffi::C_Tabpage) {
         unsafe { ffi::vim_array_add_tabpage(val, &mut self.value) }
     }
 
@@ -106,15 +106,15 @@ impl Array {
         unsafe { ffi::vim_array_add_nil(&mut self.value) }
     }
 
-    pub fn add_boolean(&mut self, val: ffi::Boolean) {
+    pub fn add_boolean(&mut self, val: ffi::C_Boolean) {
         unsafe { ffi::vim_array_add_boolean(val, &mut self.value) }
     }
 
-    pub fn add_integer(&mut self, val: ffi::Integer) {
+    pub fn add_integer(&mut self, val: ffi::C_Integer) {
         unsafe { ffi::vim_array_add_integer(val, &mut self.value) }
     }
 
-    pub fn add_float(&mut self, val: ffi::Float) {
+    pub fn add_float(&mut self, val: ffi::C_Float) {
         unsafe { ffi::vim_array_add_float(val, &mut self.value) }
     }
 
