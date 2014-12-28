@@ -39,6 +39,7 @@ pub enum ObjectType {
 #[deriving(Copy)]
 pub struct C_Object {
     pub object_type: ObjectType,
+    pub data: C_Array,
 }
 
 #[repr(C)]

@@ -48,7 +48,7 @@ pub enum Object {
     Integer(ffi::C_Integer),
     Float(ffi::C_Float),
     String(String),
-    Array(Array),
+    Array(ffi::C_Array),
     Dictionary(ffi::C_Dictionary),
 }
 
@@ -62,7 +62,7 @@ impl fmt::Show for Object {
             Object::Integer(ref obj) => write!(f, "Integer({})", obj),
             Object::Float(ref obj) => write!(f, "Float({})", obj),
             Object::String(ref obj) => write!(f, "String({})", obj),
-            Object::Array(ref obj) => write!(f, "Array(Length: {})", obj.len()),
+            Object::Array(ref obj) => write!(f, "Array(Length: {})", obj.size),
             Object::Dictionary(ref obj) => write!(f, "Dictionary(Length: {})", obj.size),
         }
     }
@@ -90,7 +90,7 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
             Some(Object::String(s))
         },
         ffi::ObjectType::ArrayType =>
-            Some(Object::Array(Array::wrap_value((*(obj as *mut ffi::C_Object_Array)).data))),
+            Some(Object::Array((*(obj as *mut ffi::C_Object_Array)).data)),
         ffi::ObjectType::DictionaryType =>
             Some(Object::Dictionary((*(obj as *mut ffi::C_Object_Dictionary)).data)),
     }
@@ -230,6 +230,7 @@ fn test_request() {
     args.add_integer(80);
     args.add_integer(24);
     args.add_string("hello");
+
     let msg = serialize_message(1, "attach_ui", &args);
     let arr = deserialize_message(&msg);
     println!("LENGTH: {}", arr.len());
