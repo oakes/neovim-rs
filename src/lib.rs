@@ -48,22 +48,22 @@ pub enum Object {
     Integer(ffi::C_Integer),
     Float(ffi::C_Float),
     String(String),
-    Array(ffi::C_Array),
+    Array(Array),
     Dictionary(ffi::C_Dictionary),
 }
 
 impl fmt::Show for Object {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Object::Buffer(_) => write!(f, "Buffer"),
-            Object::Window(_) => write!(f, "Window"),
-            Object::Tabpage(_) => write!(f, "Tabpage"),
-            Object::Boolean(_) => write!(f, "Boolean"),
-            Object::Integer(_) => write!(f, "Integer"),
-            Object::Float(_) => write!(f, "Float"),
-            Object::String(_) => write!(f, "String"),
-            Object::Array(_) => write!(f, "Array"),
-            Object::Dictionary(_) => write!(f, "Dictionary"),
+            Object::Buffer(ref obj) => write!(f, "Buffer({})", obj),
+            Object::Window(ref obj) => write!(f, "Window({})", obj),
+            Object::Tabpage(ref obj) => write!(f, "Tabpage({})", obj),
+            Object::Boolean(ref obj) => write!(f, "Boolean({})", obj),
+            Object::Integer(ref obj) => write!(f, "Integer({})", obj),
+            Object::Float(ref obj) => write!(f, "Float({})", obj),
+            Object::String(ref obj) => write!(f, "String({})", obj),
+            Object::Array(ref obj) => write!(f, "Array(Length: {})", obj.len()),
+            Object::Dictionary(ref obj) => write!(f, "Dictionary(Length: {})", obj.size),
         }
     }
 }
@@ -85,12 +85,12 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
         ffi::ObjectType::FloatType =>
             Some(Object::Float((*(obj as *mut ffi::C_Object_Float)).data)),
         ffi::ObjectType::StringType => {
-            let vim_s: ffi::C_String = (*(obj as *mut ffi::C_Object_String)).data;
-            let s = String::from_raw_buf_len(vim_s.data as *const u8, vim_s.size as uint);
+            let vim_str: ffi::C_String = (*(obj as *mut ffi::C_Object_String)).data;
+            let s = String::from_raw_buf_len(vim_str.data as *const u8, vim_str.size as uint);
             Some(Object::String(s))
         },
         ffi::ObjectType::ArrayType =>
-            Some(Object::Array((*(obj as *mut ffi::C_Object_Array)).data)),
+            Some(Object::Array(Array::wrap_value((*(obj as *mut ffi::C_Object_Array)).data))),
         ffi::ObjectType::DictionaryType =>
             Some(Object::Dictionary((*(obj as *mut ffi::C_Object_Dictionary)).data)),
     }
