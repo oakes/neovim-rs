@@ -6,6 +6,7 @@
 extern crate libc;
 
 use std::c_str::CString;
+use std::fmt;
 use std::string::String;
 use std::vec::Vec;
 
@@ -39,6 +40,62 @@ mod platform {
 
 mod ffi;
 
+pub enum Object {
+    Buffer(ffi::C_Buffer),
+    Window(ffi::C_Window),
+    Tabpage(ffi::C_Tabpage),
+    Boolean(ffi::C_Boolean),
+    Integer(ffi::C_Integer),
+    Float(ffi::C_Float),
+    String(String),
+    Array(ffi::C_Array),
+    Dictionary(ffi::C_Dictionary),
+}
+
+impl fmt::Show for Object {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Object::Buffer(_) => write!(f, "Buffer"),
+            Object::Window(_) => write!(f, "Window"),
+            Object::Tabpage(_) => write!(f, "Tabpage"),
+            Object::Boolean(_) => write!(f, "Boolean"),
+            Object::Integer(_) => write!(f, "Integer"),
+            Object::Float(_) => write!(f, "Float"),
+            Object::String(_) => write!(f, "String"),
+            Object::Array(_) => write!(f, "Array"),
+            Object::Dictionary(_) => write!(f, "Dictionary"),
+        }
+    }
+}
+
+unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
+    match (*obj).object_type {
+        ffi::ObjectType::BufferType =>
+            Some(Object::Buffer((*(obj as *mut ffi::C_Object_Buffer)).data)),
+        ffi::ObjectType::WindowType =>
+            Some(Object::Window((*(obj as *mut ffi::C_Object_Window)).data)),
+        ffi::ObjectType::TabpageType =>
+            Some(Object::Tabpage((*(obj as *mut ffi::C_Object_Tabpage)).data)),
+        ffi::ObjectType::NilType =>
+            None,
+        ffi::ObjectType::BooleanType =>
+            Some(Object::Boolean((*(obj as *mut ffi::C_Object_Boolean)).data)),
+        ffi::ObjectType::IntegerType =>
+            Some(Object::Integer((*(obj as *mut ffi::C_Object_Integer)).data)),
+        ffi::ObjectType::FloatType =>
+            Some(Object::Float((*(obj as *mut ffi::C_Object_Float)).data)),
+        ffi::ObjectType::StringType => {
+            let vim_s: ffi::C_String = (*(obj as *mut ffi::C_Object_String)).data;
+            let s = String::from_raw_buf_len(vim_s.data as *const u8, vim_s.size as uint);
+            Some(Object::String(s))
+        },
+        ffi::ObjectType::ArrayType =>
+            Some(Object::Array((*(obj as *mut ffi::C_Object_Array)).data)),
+        ffi::ObjectType::DictionaryType =>
+            Some(Object::Dictionary((*(obj as *mut ffi::C_Object_Dictionary)).data)),
+    }
+}
+
 pub fn run_with_fds(args: Vec<String>, read_fd: i32, write_fd: i32) -> i32 {
     let v: Vec<CString> = args.iter().map(|s| s.as_slice().to_c_str()).collect();
     let vp: Vec<*const ffi::c_char> = v.iter().map(|s| s.as_ptr()).collect();
@@ -55,7 +112,7 @@ pub fn serialize_message(id: u64, method: &'static str, args: &Array) -> String 
     unsafe {
         let buf = ffi::vim_msgpack_new();
         let vim_str = ffi::C_String {data: method.as_ptr() as *const i8, size: method.len() as u64};
-        ffi::vim_serialize_request(id, vim_str, args.get_value(), buf);
+        ffi::vim_serialize_request(id, vim_str, args.unwrap_value(), buf);
         let s = String::from_raw_buf_len((*buf).data as *const u8, (*buf).size as uint);
         ffi::vim_msgpack_free(buf);
         s
@@ -64,7 +121,7 @@ pub fn serialize_message(id: u64, method: &'static str, args: &Array) -> String 
 
 pub fn deserialize_message(message: &String) -> Array {
     unsafe {
-        let mut arr_raw = Array::new().get_value();
+        let mut arr_raw = Array::new().unwrap_value();
         let s = ffi::C_String {
             data: message.as_slice().as_ptr() as *const i8,
             size: message.len() as u64
@@ -129,12 +186,19 @@ impl Array {
         }
     }
 
-    pub fn add_array(&mut self, val: Array) {
-        unsafe { ffi::vim_array_add_array(val.get_value(), &mut self.value) }
+    pub fn add_array(&mut self, val: &Array) {
+        unsafe { ffi::vim_array_add_array(val.unwrap_value(), &mut self.value) }
     }
 
     pub fn add_dictionary(&mut self, val: ffi::C_Dictionary) {
         unsafe { ffi::vim_array_add_dictionary(val, &mut self.value) }
+    }
+
+    pub fn get(&self, index: u64) -> Option<Object> {
+        if index >= self.len() {
+            return None;
+        }
+        unsafe { c_object_to_object(self.value.items.offset(index as int)) }
     }
 
     pub fn len(&self) -> u64 {
@@ -142,7 +206,7 @@ impl Array {
     }
 
     #[doc(hidden)]
-    pub fn get_value(&self) -> ffi::C_Array {
+    pub fn unwrap_value(&self) -> ffi::C_Array {
         self.value
     }
 
@@ -169,4 +233,7 @@ fn test_request() {
     let msg = serialize_message(1, "attach_ui", &args);
     let arr = deserialize_message(&msg);
     println!("LENGTH: {}", arr.len());
+    for i in range(0, arr.len()) {
+        println!("{}", arr.get(i));
+    }
 }

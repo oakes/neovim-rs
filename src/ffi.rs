@@ -16,11 +16,93 @@ pub struct C_msgpack_sbuffer {
 
 #[repr(C)]
 #[deriving(Copy)]
-pub struct C_Object;
+pub struct C_KeyValuePair;
+
+// object container types
+
+#[repr(C)]
+#[deriving(Clone, PartialEq, PartialOrd, Show, Copy)]
+pub enum ObjectType {
+    BufferType,
+    WindowType,
+    TabpageType,
+    NilType,
+    BooleanType,
+    IntegerType,
+    FloatType,
+    StringType,
+    ArrayType,
+    DictionaryType,
+}
 
 #[repr(C)]
 #[deriving(Copy)]
-pub struct C_KeyValuePair;
+pub struct C_Object {
+    pub object_type: ObjectType,
+}
+
+#[repr(C)]
+#[deriving(Copy)]
+pub struct C_Object_Buffer {
+    pub object_type: ObjectType,
+    pub data: C_Buffer,
+}
+
+#[repr(C)]
+#[deriving(Copy)]
+pub struct C_Object_Window {
+    pub object_type: ObjectType,
+    pub data: C_Window,
+}
+
+#[repr(C)]
+#[deriving(Copy)]
+pub struct C_Object_Tabpage {
+    pub object_type: ObjectType,
+    pub data: C_Tabpage,
+}
+
+#[repr(C)]
+#[deriving(Copy)]
+pub struct C_Object_Boolean {
+    pub object_type: ObjectType,
+    pub data: C_Boolean,
+}
+
+#[repr(C)]
+#[deriving(Copy)]
+pub struct C_Object_Integer {
+    pub object_type: ObjectType,
+    pub data: C_Integer,
+}
+
+#[repr(C)]
+#[deriving(Copy)]
+pub struct C_Object_Float {
+    pub object_type: ObjectType,
+    pub data: C_Float,
+}
+
+#[repr(C)]
+#[deriving(Copy)]
+pub struct C_Object_String {
+    pub object_type: ObjectType,
+    pub data: C_String,
+}
+
+#[repr(C)]
+#[deriving(Copy)]
+pub struct C_Object_Array {
+    pub object_type: ObjectType,
+    pub data: C_Array,
+}
+
+#[repr(C)]
+#[deriving(Copy)]
+pub struct C_Object_Dictionary {
+    pub object_type: ObjectType,
+    pub data: C_Dictionary,
+}
 
 // object types
 
