@@ -62,7 +62,21 @@ impl fmt::Show for Object {
             Object::Integer(ref obj) => write!(f, "Integer({})", obj),
             Object::Float(ref obj) => write!(f, "Float({})", obj),
             Object::String(ref obj) => write!(f, "String({})", obj),
-            Object::Array(ref obj) => write!(f, "Array(Length: {})", obj.size),
+            Object::Array(ref obj) => {
+                write!(f, "Array(").ok();
+                for i in range(0, obj.size) {
+                    let inner_obj_opt = unsafe { c_object_to_object(obj.items.offset(i as int)) };
+                    if let Some(inner_obj) = inner_obj_opt {
+                        write!(f, "{}", inner_obj).ok();
+                        if i + 1 < obj.size {
+                            write!(f, ", ").ok();
+                        }
+                    } else {
+                        write!(f, "Nil ").ok();
+                    }
+                }
+                write!(f, ")")
+            },
             Object::Dictionary(ref obj) => write!(f, "Dictionary(Length: {})", obj.size),
         }
     }
@@ -221,6 +235,23 @@ impl Array {
 impl Drop for Array {
     fn drop(&mut self) {
         unsafe { ffi::api_free_array(self.value) };
+    }
+}
+
+impl fmt::Show for Array {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Array(").ok();
+        for i in range(0, self.len()) {
+            if let Some(obj) = self.get(i) {
+                write!(f, "{}", obj).ok();
+            } else {
+                write!(f, "Nil").ok();
+            }
+            if i + 1 < self.len() {
+                write!(f, ", ").ok();
+            }
+        }
+        write!(f, ")")
     }
 }
 
