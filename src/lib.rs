@@ -110,16 +110,20 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
     }
 }
 
-pub fn run_with_fds(args: Vec<String>, read_fd: i32, write_fd: i32) -> i32 {
+pub fn main_setup(args: Vec<String>) -> i32 {
     let v: Vec<CString> = args.iter().map(|s| s.as_slice().to_c_str()).collect();
     let vp: Vec<*const ffi::c_char> = v.iter().map(|s| s.as_ptr()).collect();
     let p_vp: *const *const ffi::c_char = vp.as_ptr();
 
-    unsafe { ffi::nvim_main(vp.len() as i32, p_vp, read_fd, write_fd) }
+    unsafe { ffi::nvim_main_setup(vp.len() as i32, p_vp) }
 }
 
-pub fn run(args: Vec<String>) -> i32 {
-    run_with_fds(args, -1, -1)
+pub fn main_loop() -> i32 {
+    unsafe { ffi::nvim_main_loop() }
+}
+
+pub fn channel_from_fds(read_fd: i32, write_fd: i32) -> u64 {
+    unsafe { ffi::channel_from_fds(read_fd, write_fd) }
 }
 
 pub fn serialize_message(id: u64, method: &'static str, args: &Array) -> String {

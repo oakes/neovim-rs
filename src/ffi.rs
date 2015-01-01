@@ -140,10 +140,9 @@ pub struct C_Dictionary {
 // functions
 
 extern "C" {
-    pub fn nvim_main (argc: c_int,
-                      argv: *const *const c_char,
-                      read_fd: c_int,
-                      write_fd: c_int) -> c_int;
+    pub fn channel_from_fds (read_fd: c_int, write_fd: c_int) -> uint64_t;
+    pub fn nvim_main_setup (argc: c_int, argv: *const *const c_char) -> c_int;
+    pub fn nvim_main_loop () -> c_int;
     pub fn api_free_array (arr: C_Array);
     pub fn vim_array_add_buffer (val: C_Buffer, arr: *mut C_Array);
     pub fn vim_array_add_window (val: C_Window, arr: *mut C_Array);
