@@ -149,7 +149,7 @@ pub fn deserialize_message(message: &String) -> Array {
     }
 }
 
-#[deriving(Copy)]
+#[derive(Copy)]
 pub struct Array {
     value: ffi::C_Array
 }
