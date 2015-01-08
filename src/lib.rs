@@ -1,11 +1,11 @@
 #![crate_name = "neovim"]
 #![crate_type = "lib"]
 #![crate_type = "rlib"]
-#![allow(raw_pointer_deriving)]
+#![allow(raw_pointer_derive)]
 
 extern crate libc;
 
-use std::c_str::CString;
+use std::ffi::CString;
 use std::fmt;
 use std::string::String;
 use std::vec::Vec;
@@ -100,8 +100,8 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
             Some(Object::Float((*(obj as *mut ffi::C_Object_Float)).data)),
         ffi::ObjectType::StringType => {
             let vim_str: ffi::C_String = (*(obj as *mut ffi::C_Object_String)).data;
-            let s = String::from_raw_buf_len(vim_str.data as *const u8, vim_str.size as uint);
-            Some(Object::String(s))
+            let v = Vec::from_raw_buf(vim_str.data as *const u8, vim_str.size as uint);
+            Some(Object::String(String::from_utf8_unchecked(v)))
         },
         ffi::ObjectType::ArrayType =>
             Some(Object::Array((*(obj as *mut ffi::C_Object_Array)).data)),
@@ -111,7 +111,7 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
 }
 
 pub fn main_setup(args: Vec<String>) -> i32 {
-    let v: Vec<CString> = args.iter().map(|s| s.as_slice().to_c_str()).collect();
+    let v: Vec<CString> = args.iter().map(|s| CString::from_slice(s.as_bytes())).collect();
     let vp: Vec<*const ffi::c_char> = v.iter().map(|s| s.as_ptr()).collect();
     let p_vp: *const *const ffi::c_char = vp.as_ptr();
 
@@ -131,9 +131,9 @@ pub fn serialize_message(id: u64, method: &'static str, args: &Array) -> String 
         let buf = ffi::vim_msgpack_new();
         let vim_str = ffi::C_String {data: method.as_ptr() as *const i8, size: method.len() as u64};
         ffi::vim_serialize_request(id, vim_str, args.unwrap_value(), buf);
-        let s = String::from_raw_buf_len((*buf).data as *const u8, (*buf).size as uint);
+        let v = Vec::from_raw_buf((*buf).data as *const u8, (*buf).size as uint);
         ffi::vim_msgpack_free(buf);
-        s
+        String::from_utf8_unchecked(v)
     }
 }
 
