@@ -55,19 +55,19 @@ pub enum Object {
 impl fmt::Show for Object {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Object::Buffer(ref obj) => write!(f, "Buffer({})", obj),
-            Object::Window(ref obj) => write!(f, "Window({})", obj),
-            Object::Tabpage(ref obj) => write!(f, "Tabpage({})", obj),
-            Object::Boolean(ref obj) => write!(f, "Boolean({})", obj),
-            Object::Integer(ref obj) => write!(f, "Integer({})", obj),
-            Object::Float(ref obj) => write!(f, "Float({})", obj),
-            Object::String(ref obj) => write!(f, "String({})", obj),
+            Object::Buffer(ref obj) => write!(f, "Buffer({:?})", obj),
+            Object::Window(ref obj) => write!(f, "Window({:?})", obj),
+            Object::Tabpage(ref obj) => write!(f, "Tabpage({:?})", obj),
+            Object::Boolean(ref obj) => write!(f, "Boolean({:?})", obj),
+            Object::Integer(ref obj) => write!(f, "Integer({:?})", obj),
+            Object::Float(ref obj) => write!(f, "Float({:?})", obj),
+            Object::String(ref obj) => write!(f, "String({:?})", obj),
             Object::Array(ref obj) => {
                 write!(f, "Array(").ok();
                 for i in range(0, obj.size) {
-                    let inner_obj_opt = unsafe { c_object_to_object(obj.items.offset(i as int)) };
+                    let inner_obj_opt = unsafe { c_object_to_object(obj.items.offset(i as isize)) };
                     if let Some(inner_obj) = inner_obj_opt {
-                        write!(f, "{}", inner_obj).ok();
+                        write!(f, "{:?}", inner_obj).ok();
                         if i + 1 < obj.size {
                             write!(f, ", ").ok();
                         }
@@ -77,7 +77,7 @@ impl fmt::Show for Object {
                 }
                 write!(f, ")")
             },
-            Object::Dictionary(ref obj) => write!(f, "Dictionary(Length: {})", obj.size),
+            Object::Dictionary(ref obj) => write!(f, "Dictionary(Length: {:?})", obj.size),
         }
     }
 }
@@ -100,7 +100,7 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
             Some(Object::Float((*(obj as *mut ffi::C_Object_Float)).data)),
         ffi::ObjectType::StringType => {
             let vim_str: ffi::C_String = (*(obj as *mut ffi::C_Object_String)).data;
-            let v = Vec::from_raw_buf(vim_str.data as *const u8, vim_str.size as uint);
+            let v = Vec::from_raw_buf(vim_str.data as *const u8, vim_str.size as usize);
             Some(Object::String(String::from_utf8_unchecked(v)))
         },
         ffi::ObjectType::ArrayType =>
@@ -131,7 +131,7 @@ pub fn serialize_message(id: u64, method: &'static str, args: &Array) -> String 
         let buf = ffi::vim_msgpack_new();
         let vim_str = ffi::C_String {data: method.as_ptr() as *const i8, size: method.len() as u64};
         ffi::vim_serialize_request(id, vim_str, args.unwrap_value(), buf);
-        let v = Vec::from_raw_buf((*buf).data as *const u8, (*buf).size as uint);
+        let v = Vec::from_raw_buf((*buf).data as *const u8, (*buf).size as usize);
         ffi::vim_msgpack_free(buf);
         String::from_utf8_unchecked(v)
     }
@@ -149,7 +149,6 @@ pub fn deserialize_message(message: &String) -> Array {
     }
 }
 
-#[derive(Copy)]
 pub struct Array {
     value: ffi::C_Array
 }
@@ -213,10 +212,10 @@ impl Array {
     }
 
     pub fn get(&self, index: u64) -> Option<Object> {
-        if index >= self.len() {
+        if index >= self.len() || index < 0 {
             return None;
         }
-        unsafe { c_object_to_object(self.value.items.offset(index as int)) }
+        unsafe { c_object_to_object(self.value.items.offset(index as isize)) }
     }
 
     pub fn len(&self) -> u64 {
@@ -247,7 +246,7 @@ impl fmt::Show for Array {
         write!(f, "Array(").ok();
         for i in range(0, self.len()) {
             if let Some(obj) = self.get(i) {
-                write!(f, "{}", obj).ok();
+                write!(f, "{:?}", obj).ok();
             } else {
                 write!(f, "Nil").ok();
             }
@@ -270,6 +269,6 @@ fn test_request() {
     let arr = deserialize_message(&msg);
     println!("LENGTH: {}", arr.len());
     for i in range(0, arr.len()) {
-        println!("{}", arr.get(i));
+        println!("{:?}", arr.get(i));
     }
 }
