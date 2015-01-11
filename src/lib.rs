@@ -139,10 +139,14 @@ pub fn serialize_message(id: u64, method: &'static str, args: &Array) -> String 
 
 pub fn deserialize_message(message: &String) -> Array {
     unsafe {
-        let mut arr_raw = Array::new().unwrap_value();
         let s = ffi::C_String {
             data: message.as_slice().as_ptr() as *const i8,
             size: message.len() as u64
+        };
+        let mut arr_raw = ffi::C_Array {
+            items: ::std::ptr::null_mut(),
+            size: 0,
+            capacity: 0,
         };
         ffi::vim_msgpack_parse(s, &mut arr_raw);
         Array::wrap_value(arr_raw)
