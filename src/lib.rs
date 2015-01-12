@@ -214,7 +214,7 @@ impl Array {
     }
 
     pub fn get(&self, index: u64) -> Option<Object> {
-        if index >= self.len() || index < 0 {
+        if index >= self.len() {
             return None;
         }
         unsafe { c_object_to_object(self.value.items.offset(index as isize)) }
