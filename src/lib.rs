@@ -52,7 +52,7 @@ pub enum Object {
     Dictionary(ffi::C_Dictionary),
 }
 
-impl fmt::Show for Object {
+impl fmt::Debug for Object {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Object::Buffer(ref obj) => write!(f, "Buffer({:?})", obj),
@@ -243,7 +243,7 @@ impl Drop for Array {
     }
 }
 
-impl fmt::Show for Array {
+impl fmt::Debug for Array {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Array(").ok();
         for i in range(0, self.len()) {

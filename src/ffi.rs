@@ -21,7 +21,7 @@ pub struct C_KeyValuePair;
 // object container types
 
 #[repr(C)]
-#[derive(Clone, PartialEq, PartialOrd, Show, Copy)]
+#[derive(Clone, PartialEq, PartialOrd, Debug, Copy)]
 pub enum ObjectType {
     BufferType,
     WindowType,
