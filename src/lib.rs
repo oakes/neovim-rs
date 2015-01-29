@@ -267,7 +267,7 @@ fn test_request() {
     args.add_integer(24);
     args.add_string("hello");
 
-    let msg = serialize_message(1, "attach_ui", &args);
+    let msg = serialize_message(1, "test", &args);
     let arr = deserialize_message(&msg);
     println!("LENGTH: {}", arr.len());
     for i in range(0, arr.len()) {
