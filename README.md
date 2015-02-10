@@ -1,6 +1,6 @@
 ## Introduction
 
-A Neovim wrapper for Rust.
+A library for embedding Neovim inside a Rust project.
 
 ## Build Instructions
 
