@@ -4,6 +4,9 @@ name = "neovim-rs"
 version = "0.0.1"
 authors = ["oakes <zsoakes@gmail.com>"]
 build = "build.rs"
+description = "A Neovim wrapper"
+license = "Unlicense"
+repository = "https://github.com/oakes/neovim-rs"
 
 [lib]
 
