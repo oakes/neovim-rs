@@ -48,7 +48,7 @@ pub enum Object {
     Integer(ffi::C_Integer),
     Float(ffi::C_Float),
     String(String),
-    Array(ffi::C_Array),
+    Array(Array),
     Dictionary(ffi::C_Dictionary),
 }
 
@@ -62,8 +62,9 @@ impl fmt::Debug for Object {
             Object::Integer(ref obj) => write!(f, "Integer({:?})", obj),
             Object::Float(ref obj) => write!(f, "Float({:?})", obj),
             Object::String(ref obj) => write!(f, "String({:?})", obj),
-            Object::Array(ref obj) => {
+            Object::Array(ref arr) => {
                 write!(f, "Array(").ok();
+                let obj = arr.unwrap_value();
                 for i in range(0, obj.size) {
                     let inner_obj_opt = unsafe { c_object_to_object(obj.items.offset(i as isize)) };
                     if let Some(inner_obj) = inner_obj_opt {
@@ -104,7 +105,7 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
             Some(Object::String(String::from_utf8_unchecked(v)))
         },
         ffi::ObjectType::ArrayType =>
-            Some(Object::Array((*(obj as *mut ffi::C_Object_Array)).data)),
+            Some(Object::Array(Array::wrap_value((*(obj as *mut ffi::C_Object_Array)).data))),
         ffi::ObjectType::DictionaryType =>
             Some(Object::Dictionary((*(obj as *mut ffi::C_Object_Dictionary)).data)),
     }
@@ -152,7 +153,8 @@ pub fn deserialize_message(message: &String) -> Array {
 }
 
 pub struct Array {
-    value: ffi::C_Array
+    value: ffi::C_Array,
+    is_owned: bool,
 }
 
 impl Array {
@@ -162,7 +164,8 @@ impl Array {
                 items: ::std::ptr::null_mut(),
                 size: 0,
                 capacity: 0,
-            }
+            },
+            is_owned: true,
         }
     }
 
@@ -232,14 +235,17 @@ impl Array {
     #[doc(hidden)]
     pub fn wrap_value(c_array: ffi::C_Array) -> Array {
         Array {
-            value: c_array
+            value: c_array,
+            is_owned: false,
         }
     }
 }
 
 impl Drop for Array {
     fn drop(&mut self) {
-        unsafe { ffi::api_free_array(self.value) };
+        if self.is_owned {
+            unsafe { ffi::api_free_array(self.value) };
+        }
     }
 }
 
