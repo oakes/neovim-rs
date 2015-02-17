@@ -15,7 +15,8 @@ mod platform {
     #[link(name = "nvim")]
     #[link(name = "uv")]
     #[link(name = "msgpack")]
-    #[link(name = "curses")]
+    #[link(name = "termkey", kind = "static")]
+    #[link(name = "unibilium", kind = "static")]
     #[link(name = "iconv")]
     extern{}
 }
@@ -25,16 +26,8 @@ mod platform {
     #[link(name = "nvim")]
     #[link(name = "uv")]
     #[link(name = "msgpack")]
-    #[link(name = "curses")]
-    extern{}
-}
-
-#[cfg(target_os="windows")]
-mod platform {
-    #[link(name = "nvim")]
-    #[link(name = "uv")]
-    #[link(name = "msgpack")]
-    #[link(name = "curses")]
+    #[link(name = "termkey", kind = "static")]
+    #[link(name = "unibilium", kind = "static")]
     extern{}
 }
 
