@@ -9,16 +9,6 @@ mod ffi {
     pub use libc::types::os::arch::c95::size_t;
 }
 
-fn nvim_attach(fd: ffi::c_int) {
-    let mut arr = neovim::Array::new();
-    arr.add_integer(80);
-    arr.add_integer(24);
-    arr.add_boolean(true);
-    let msg = neovim::serialize_message(1, "ui_attach", &arr);
-    let msg_ptr = msg.as_slice().as_ptr() as *const ffi::c_void;
-    unsafe { ffi::write(fd, msg_ptr, msg.len() as ffi::size_t) };
-}
-
 fn nvim_execute(fd: ffi::c_int, command: &str) {
     let mut arr = neovim::Array::new();
     arr.add_string(command);
@@ -51,11 +41,8 @@ fn main() {
 
     // listen for events in a separate thread and log them
     ::std::thread::Thread::spawn(move || {
-        // start communicating with nvim
-        nvim_attach(nvim_log[1]);
-
-        // listen for bufread events
-        nvim_execute(nvim_log[1], "au BufRead * call rpcnotify(1, \"bufread\", bufname(\"\"))");
+        // listen for bufenter events
+        nvim_execute(nvim_log[1], "au BufEnter * call rpcnotify(1, \"bufenter\", bufname(\"\"))");
 
         // receive messages
         let mut file = File::open_mode(&Path::new("events.log"), FileMode::Append, FileAccess::Write);
@@ -69,7 +56,7 @@ fn main() {
     // start nvim
     let mut args = Vec::new();
     for arg in ::std::env::args() {
-        args.push(arg.into_string().unwrap());
+        args.push(arg);
     }
     neovim::main_setup(&args);
     neovim::channel_from_fds(nvim_log[0], log_nvim[1]);
