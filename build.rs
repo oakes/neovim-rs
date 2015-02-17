@@ -1,6 +1,15 @@
 use std::old_io::Command;
 use std::env;
 
+#[cfg(target_os="macos")]
+fn print_lib_dir() {
+    println!("cargo:rustc-flags=-L /usr/local/opt/gettext/lib/");
+}
+
+#[cfg(not(target_os="macos"))]
+fn print_lib_dir() {
+}
+
 fn main() {
     let curr_dir = Path::new(env::var("CARGO_MANIFEST_DIR").unwrap());
     Command::new("git").arg("submodule").arg("update").arg("--init").cwd(&curr_dir).status().unwrap();
@@ -14,4 +23,6 @@ fn main() {
     println!("cargo:rustc-flags=-L {} -L {} -l nvim:static",
         nvim_lib_dir.as_str().unwrap(),
         deps_lib_dir.as_str().unwrap());
+
+    print_lib_dir();
 }

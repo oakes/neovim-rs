@@ -21,7 +21,7 @@ cargo build
 ### OS X (homebrew)
 
 ```Shell
-brew install libtool automake cmake pkg-config
+brew install libtool automake cmake pkg-config gettext
 cargo build
 ```
 
