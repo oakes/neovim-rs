@@ -9,7 +9,7 @@ mod ffi {
     pub use libc::types::os::arch::c95::size_t;
 }
 
-fn nvim_execute(fd: ffi::c_int, command: &str) {
+fn send_message(fd: ffi::c_int, command: &str) {
     let mut arr = neovim::Array::new();
     arr.add_string(command);
     let msg = neovim::serialize_message(1, "vim_command", &arr);
@@ -17,7 +17,7 @@ fn nvim_execute(fd: ffi::c_int, command: &str) {
     unsafe { ffi::write(fd, msg_ptr, msg.len() as ffi::size_t) };
 }
 
-fn receive_message(fd: ffi::c_int) -> Option<neovim::Array> {
+fn recv_message(fd: ffi::c_int) -> Option<neovim::Array> {
     let mut buf : [ffi::c_uchar; 1024] = [0; 1024];
     let n = unsafe { ffi::read(fd, buf.as_mut_ptr() as *mut ffi::c_void, 1024) };
     if n < 0 {
@@ -42,11 +42,11 @@ fn main() {
     // listen for events in a separate thread and log them
     ::std::thread::Thread::spawn(move || {
         // listen for bufenter events
-        nvim_execute(nvim_log[1], "au BufEnter * call rpcnotify(1, \"bufenter\", bufname(\"\"))");
+        send_message(nvim_log[1], "au BufEnter * call rpcnotify(1, \"bufenter\", bufname(\"\"))");
 
         // receive messages
         let mut file = File::open_mode(&Path::new("events.log"), FileMode::Append, FileAccess::Write);
-        while let Some(recv_arr) = receive_message(log_nvim[0]) {
+        while let Some(recv_arr) = recv_message(log_nvim[0]) {
             if recv_arr.len() > 0 {
                 file.write_all(format!("{:?}\n", recv_arr).into_bytes().as_slice());
             }
