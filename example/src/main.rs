@@ -42,7 +42,7 @@ fn main() {
     // listen for events in a separate thread and log them
     ::std::thread::Thread::spawn(move || {
         // listen for bufenter events
-        send_message(nvim_log[1], "au BufEnter * call rpcnotify(1, \"bufenter\", bufname(\"\"))");
+        send_message(nvim_log[1], "au BufEnter * call rpcnotify(1, 'bufenter', fnamemodify(bufname(''), ':p'))");
 
         // receive messages
         let mut file = File::open_mode(&Path::new("events.log"), FileMode::Append, FileAccess::Write);
