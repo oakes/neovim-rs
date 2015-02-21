@@ -2,24 +2,21 @@ extern crate libc;
 extern crate neovim;
 
 use std::old_io::{File, FileMode, FileAccess};
+use libc::{c_int, c_uchar, c_void};
+use libc::funcs::posix88::unistd::{close, pipe, read, write};
+use libc::types::os::arch::c95::size_t;
 
-mod ffi {
-    pub use libc::{c_int, c_uchar, c_void};
-    pub use libc::funcs::posix88::unistd::{close, pipe, read, write};
-    pub use libc::types::os::arch::c95::size_t;
-}
-
-fn send_message(fd: ffi::c_int, command: &str) {
+fn send_message(fd: c_int, command: &str) {
     let mut arr = neovim::Array::new();
     arr.add_string(command);
     let msg = neovim::serialize_message(1, "vim_command", &arr);
-    let msg_ptr = msg.as_slice().as_ptr() as *const ffi::c_void;
-    unsafe { ffi::write(fd, msg_ptr, msg.len() as ffi::size_t) };
+    let msg_ptr = msg.as_slice().as_ptr() as *const c_void;
+    unsafe { write(fd, msg_ptr, msg.len() as size_t) };
 }
 
-fn recv_message(fd: ffi::c_int) -> Option<neovim::Array> {
-    let mut buf : [ffi::c_uchar; 1024] = [0; 1024];
-    let n = unsafe { ffi::read(fd, buf.as_mut_ptr() as *mut ffi::c_void, 1024) };
+fn recv_message(fd: c_int) -> Option<neovim::Array> {
+    let mut buf : [c_uchar; 1024] = [0; 1024];
+    let n = unsafe { read(fd, buf.as_mut_ptr() as *mut c_void, 1024) };
     if n < 0 {
         return None;
     }
@@ -32,11 +29,11 @@ fn recv_message(fd: ffi::c_int) -> Option<neovim::Array> {
 
 fn main() {
     // two pairs of anonymous pipes for msgpack-rpc between the logger and nvim
-    let mut nvim_log : [ffi::c_int; 2] = [0; 2]; // to nvim from logger
-    let mut log_nvim : [ffi::c_int; 2] = [0; 2]; // to logger from nvim
+    let mut nvim_log : [c_int; 2] = [0; 2]; // to nvim from logger
+    let mut log_nvim : [c_int; 2] = [0; 2]; // to logger from nvim
     unsafe {
-        ffi::pipe(nvim_log.as_mut_ptr());
-        ffi::pipe(log_nvim.as_mut_ptr());
+        pipe(nvim_log.as_mut_ptr());
+        pipe(log_nvim.as_mut_ptr());
     };
 
     // listen for events in a separate thread and log them
