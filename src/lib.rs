@@ -106,7 +106,7 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
 }
 
 pub fn main_setup(args: &Vec<String>) -> i32 {
-    let v: Vec<CString> = args.iter().map(|s| CString::from_slice(s.as_bytes())).collect();
+    let v: Vec<CString> = args.iter().map(|s| CString::new(s.as_bytes()).ok().unwrap()).collect();
     let vp: Vec<*const ffi::c_char> = v.iter().map(|s| s.as_ptr()).collect();
     let p_vp: *const *const ffi::c_char = vp.as_ptr();
 
