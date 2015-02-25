@@ -3,7 +3,7 @@ extern crate neovim;
 
 use std::old_io::{File, FileMode, FileAccess};
 use libc::{c_int, c_uchar, c_void};
-use libc::funcs::posix88::unistd::{close, pipe, read, write};
+use libc::funcs::posix88::unistd::{pipe, read, write};
 use libc::types::os::arch::c95::size_t;
 
 fn send_message(fd: c_int, command: &str) {
@@ -28,7 +28,7 @@ fn recv_message(fd: c_int) -> Option<neovim::Array> {
 }
 
 fn main() {
-    // two pairs of anonymous pipes for msgpack-rpc between the logger and nvim
+    // two anonymous pipes for msgpack-rpc between the logger and nvim
     let mut nvim_log : [c_int; 2] = [0; 2]; // to nvim from logger
     let mut log_nvim : [c_int; 2] = [0; 2]; // to logger from nvim
     unsafe {
@@ -45,16 +45,13 @@ fn main() {
         let mut file = File::open_mode(&Path::new("events.log"), FileMode::Append, FileAccess::Write);
         while let Some(recv_arr) = recv_message(log_nvim[0]) {
             if recv_arr.len() > 0 {
-                file.write_all(format!("{:?}\n", recv_arr).into_bytes().as_slice());
+                file.write_all(format!("{:?}\n", recv_arr).into_bytes().as_slice()).ok();
             }
         }
     });
 
     // start nvim
-    let mut args = Vec::new();
-    for arg in ::std::env::args() {
-        args.push(arg);
-    }
+    let args : Vec<String> = ::std::env::args().collect();
     neovim::main_setup(&args);
     neovim::channel_from_fds(nvim_log[0], log_nvim[1]);
     neovim::main_loop();
