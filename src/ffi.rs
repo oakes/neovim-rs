@@ -11,7 +11,7 @@ pub use libc::types::os::arch::c95::size_t;
 pub struct C_msgpack_sbuffer {
     pub size: size_t,
     pub data: *const c_char,
-    pub alloc: size_t,
+    pub alloc: size_t
 }
 
 #[repr(C)]
@@ -32,77 +32,77 @@ pub enum ObjectType {
     FloatType,
     StringType,
     ArrayType,
-    DictionaryType,
+    DictionaryType
 }
 
 #[repr(C)]
 #[derive(Copy)]
 pub struct C_Object {
     pub object_type: ObjectType,
-    pub data: C_Array,
+    pub data: C_Array
 }
 
 #[repr(C)]
 #[derive(Copy)]
 pub struct C_Object_Buffer {
     pub object_type: ObjectType,
-    pub data: C_Buffer,
+    pub data: C_Buffer
 }
 
 #[repr(C)]
 #[derive(Copy)]
 pub struct C_Object_Window {
     pub object_type: ObjectType,
-    pub data: C_Window,
+    pub data: C_Window
 }
 
 #[repr(C)]
 #[derive(Copy)]
 pub struct C_Object_Tabpage {
     pub object_type: ObjectType,
-    pub data: C_Tabpage,
+    pub data: C_Tabpage
 }
 
 #[repr(C)]
 #[derive(Copy)]
 pub struct C_Object_Boolean {
     pub object_type: ObjectType,
-    pub data: C_Boolean,
+    pub data: C_Boolean
 }
 
 #[repr(C)]
 #[derive(Copy)]
 pub struct C_Object_Integer {
     pub object_type: ObjectType,
-    pub data: C_Integer,
+    pub data: C_Integer
 }
 
 #[repr(C)]
 #[derive(Copy)]
 pub struct C_Object_Float {
     pub object_type: ObjectType,
-    pub data: C_Float,
+    pub data: C_Float
 }
 
 #[repr(C)]
 #[derive(Copy)]
 pub struct C_Object_String {
     pub object_type: ObjectType,
-    pub data: C_String,
+    pub data: C_String
 }
 
 #[repr(C)]
 #[derive(Copy)]
 pub struct C_Object_Array {
     pub object_type: ObjectType,
-    pub data: C_Array,
+    pub data: C_Array
 }
 
 #[repr(C)]
 #[derive(Copy)]
 pub struct C_Object_Dictionary {
     pub object_type: ObjectType,
-    pub data: C_Dictionary,
+    pub data: C_Dictionary
 }
 
 // object types
@@ -118,7 +118,7 @@ pub type C_Float = c_double;
 #[derive(Copy)]
 pub struct C_String {
     pub data: *const c_char,
-    pub size: size_t,
+    pub size: size_t
 }
 
 #[repr(C)]
@@ -126,7 +126,7 @@ pub struct C_String {
 pub struct C_Array {
     pub items: *mut C_Object,
     pub size: size_t,
-    pub capacity: size_t,
+    pub capacity: size_t
 }
 
 #[repr(C)]
@@ -134,7 +134,7 @@ pub struct C_Array {
 pub struct C_Dictionary {
     pub items: *mut C_KeyValuePair,
     pub size: size_t,
-    pub capacity: size_t,
+    pub capacity: size_t
 }
 
 // functions

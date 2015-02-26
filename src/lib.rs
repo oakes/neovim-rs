@@ -45,7 +45,7 @@ pub enum Object {
     Float(ffi::C_Float),
     String(String),
     Array(Array),
-    Dictionary(ffi::C_Dictionary),
+    Dictionary(ffi::C_Dictionary)
 }
 
 impl fmt::Debug for Object {
@@ -74,7 +74,7 @@ impl fmt::Debug for Object {
                 }
                 write!(f, ")")
             },
-            Object::Dictionary(ref obj) => write!(f, "Dictionary(Length: {:?})", obj.size),
+            Object::Dictionary(ref obj) => write!(f, "Dictionary(Length: {:?})", obj.size)
         }
     }
 }
@@ -103,7 +103,7 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
         ffi::ObjectType::ArrayType =>
             Some(Object::Array(Array::wrap_value((*(obj as *mut ffi::C_Object_Array)).data))),
         ffi::ObjectType::DictionaryType =>
-            Some(Object::Dictionary((*(obj as *mut ffi::C_Object_Dictionary)).data)),
+            Some(Object::Dictionary((*(obj as *mut ffi::C_Object_Dictionary)).data))
     }
 }
 
@@ -142,7 +142,7 @@ pub fn deserialize_message(message: &String) -> Array {
     let mut arr_raw = ffi::C_Array {
         items: ::std::ptr::null_mut(),
         size: 0,
-        capacity: 0,
+        capacity: 0
     };
     unsafe { ffi::vim_msgpack_parse(s, &mut arr_raw) };
     Array::wrap_value(arr_raw)
@@ -159,9 +159,9 @@ impl Array {
             value: ffi::C_Array {
                 items: ::std::ptr::null_mut(),
                 size: 0,
-                capacity: 0,
+                capacity: 0
             },
-            is_owned: true,
+            is_owned: true
         }
     }
 
@@ -232,7 +232,7 @@ impl Array {
     pub fn wrap_value(c_array: ffi::C_Array) -> Array {
         Array {
             value: c_array,
-            is_owned: false,
+            is_owned: false
         }
     }
 }
