@@ -7,8 +7,6 @@ extern crate libc;
 
 use std::ffi::CString;
 use std::fmt;
-use std::string::String;
-use std::vec::Vec;
 
 #[cfg(target_os="macos")]
 mod platform {
@@ -107,12 +105,10 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
     }
 }
 
-pub fn main_setup(args: &Vec<String>) -> i32 {
-    let v: Vec<CString> = args.iter().map(|s| CString::new(s.as_bytes()).ok().unwrap()).collect();
-    let vp: Vec<*const ffi::c_char> = v.iter().map(|s| s.as_ptr()).collect();
-    let p_vp: *const *const ffi::c_char = vp.as_ptr();
-
-    unsafe { ffi::nvim_main_setup(vp.len() as i32, p_vp) }
+pub fn main_setup(args: &[&str]) -> i32 {
+    let args_vec_cstr: Vec<CString> = args.iter().map(|s| CString::new(*s).ok().unwrap()).collect();
+    let args_vec_ptr: Vec<*const ffi::c_char> = args_vec_cstr.iter().map(|s| s.as_ptr()).collect();
+    unsafe { ffi::nvim_main_setup(args_vec_ptr.len() as i32, args_vec_ptr.as_ptr()) }
 }
 
 pub fn main_loop() -> i32 {
