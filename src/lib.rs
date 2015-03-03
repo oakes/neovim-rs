@@ -106,7 +106,7 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
 }
 
 pub fn main_setup(args: &[&str]) -> i32 {
-    let args_vec_cstr: Vec<CString> = args.iter().map(|s| CString::new(*s).ok().unwrap()).collect();
+    let args_vec_cstr: Vec<CString> = args.iter().map(|s| CString::new(*s).unwrap()).collect();
     let args_vec_ptr: Vec<*const ffi::c_char> = args_vec_cstr.iter().map(|s| s.as_ptr()).collect();
     unsafe { ffi::nvim_main_setup(args_vec_ptr.len() as i32, args_vec_ptr.as_ptr()) }
 }
