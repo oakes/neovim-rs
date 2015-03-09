@@ -51,9 +51,8 @@ fn main() {
     });
 
     // start nvim
-    let args_vec_str : Vec<String> = ::std::env::args().collect();
-    let args_vec_slice : Vec<&str> = args_vec_str.iter().map(|s| s.as_slice()).collect();
-    neovim::main_setup(args_vec_slice.as_slice());
+    let args : Vec<String> = ::std::env::args().collect();
+    neovim::main_setup(&args);
     neovim::channel_from_fds(nvim_log[0], log_nvim[1]);
     neovim::main_loop();
 }
