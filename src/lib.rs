@@ -60,7 +60,7 @@ impl fmt::Debug for Object {
             Object::Array(ref arr) => {
                 write!(f, "Array(").ok();
                 let obj = arr.unwrap_value();
-                for i in range(0, obj.size) {
+                for i in 0..obj.size {
                     let inner_obj_opt = unsafe { c_object_to_object(obj.items.offset(i as isize)) };
                     if let Some(inner_obj) = inner_obj_opt {
                         write!(f, "{:?}", inner_obj).ok();
@@ -245,7 +245,7 @@ impl Drop for Array {
 impl fmt::Debug for Array {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Array(").ok();
-        for i in range(0, self.len()) {
+        for i in 0..self.len() {
             if let Some(obj) = self.get(i) {
                 write!(f, "{:?}", obj).ok();
             } else {
@@ -269,7 +269,7 @@ fn test_request() {
     let msg = serialize_message(1, "test", &args);
     let arr = deserialize_message(&msg);
     println!("LENGTH: {}", arr.len());
-    for i in range(0, arr.len()) {
+    for i in 0..arr.len() {
         println!("{:?}", arr.get(i));
     }
 }
