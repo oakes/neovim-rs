@@ -1,7 +1,11 @@
+#![feature(collections, core, libc)]
+
 extern crate libc;
 extern crate neovim;
 
-use std::old_io::{File, FileMode, FileAccess};
+use std::io::Write;
+use std::fs::OpenOptions;
+use std::path::Path;
 use libc::{c_int, c_uchar, c_void};
 use libc::funcs::posix88::unistd::{pipe, read, write};
 use libc::types::os::arch::c95::size_t;
@@ -36,13 +40,19 @@ fn main() {
         pipe(log_nvim.as_mut_ptr());
     };
 
+    // open log file
+    let mut opts = OpenOptions::new();
+    opts.create(true);
+    opts.write(true);
+    opts.append(true);
+    let mut file = opts.open(&Path::new("events.log")).unwrap();
+
     // listen for events in a separate thread and log them
-    ::std::thread::Thread::spawn(move || {
+    ::std::thread::spawn(move || {
         // listen for bufenter events
         send_message(nvim_log[1], "au BufEnter * call rpcnotify(1, 'bufenter', fnamemodify(bufname(''), ':p'))");
 
         // receive messages
-        let mut file = File::open_mode(&Path::new("events.log"), FileMode::Append, FileAccess::Write);
         while let Some(recv_arr) = recv_message(log_nvim[0]) {
             if recv_arr.len() > 0 {
                 file.write_all(format!("{:?}\n", recv_arr).into_bytes().as_slice()).ok();
