@@ -1,4 +1,4 @@
-#![feature(collections, core, libc)]
+#![feature(collections, convert, libc)]
 
 extern crate libc;
 extern crate neovim;
@@ -14,7 +14,8 @@ fn send_message(fd: c_int, command: &str) {
     let mut arr = neovim::Array::new();
     arr.add_string(command);
     let msg = neovim::serialize_message(1, "vim_command", &arr);
-    let msg_ptr = msg.as_slice().as_ptr() as *const c_void;
+    let msg_ref: &str = msg.as_ref();
+    let msg_ptr = msg_ref.as_ptr() as *const c_void;
     unsafe { write(fd, msg_ptr, msg.len() as size_t) };
 }
 
@@ -55,7 +56,8 @@ fn main() {
         // receive messages
         while let Some(recv_arr) = recv_message(log_nvim[0]) {
             if recv_arr.len() > 0 {
-                file.write_all(format!("{:?}\n", recv_arr).into_bytes().as_slice()).ok();
+                let recv_str = format!("{:?}\n", recv_arr).into_bytes();
+                file.write_all(recv_str.as_ref()).ok();
             }
         }
     });
