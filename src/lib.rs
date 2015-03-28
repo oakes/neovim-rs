@@ -1,4 +1,4 @@
-#![feature(collections, core, libc)]
+#![feature(collections, convert, libc)]
 #![allow(raw_pointer_derive)]
 #![crate_name = "neovim"]
 #![crate_type = "lib"]
@@ -107,7 +107,10 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
 }
 
 pub fn main_setup(args: &Vec<String>) -> i32 {
-    let args_vec_cstr: Vec<CString> = args.iter().map(|s| CString::new(s.as_slice()).unwrap()).collect();
+    let args_vec_cstr: Vec<CString> = args.iter().map(|s| {
+        let s_ref: &str = s.as_ref();
+        CString::new(s_ref).unwrap()
+    }).collect();
     let args_vec_ptr: Vec<*const ffi::c_char> = args_vec_cstr.iter().map(|s| s.as_ptr()).collect();
     unsafe { ffi::nvim_main_setup(args_vec_ptr.len() as i32, args_vec_ptr.as_ptr()) }
 }
@@ -132,8 +135,9 @@ pub fn serialize_message(id: u64, method: &'static str, args: &Array) -> String 
 }
 
 pub fn deserialize_message(message: &String) -> Array {
+    let message_ref: &str = message.as_ref();
     let s = ffi::C_String {
-        data: message.as_slice().as_ptr() as *const i8,
+        data: message_ref.as_ptr() as *const i8,
         size: message.len() as u64
     };
     let mut arr_raw = ffi::C_Array {
