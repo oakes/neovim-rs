@@ -23,7 +23,7 @@ fn main() {
 
     let nvim_lib_dir = nvim_dir.join("build").join("lib");
     let deps_lib_dir = nvim_dir.join(".deps").join("usr").join("lib");
-    println!("cargo:rustc-flags=-L {} -L {} -l nvim:static",
+    println!("cargo:rustc-flags=-L {} -L {} -l nvim",
         nvim_lib_dir.to_str().unwrap(),
         deps_lib_dir.to_str().unwrap());
 
