@@ -14,8 +14,8 @@ mod platform {
     #[link(name = "nvim")]
     #[link(name = "uv")]
     #[link(name = "msgpack")]
-    #[link(name = "termkey", kind = "static")]
-    #[link(name = "unibilium", kind = "static")]
+    #[link(name = "termkey")]
+    #[link(name = "unibilium")]
     #[link(name = "util")]
     #[link(name = "intl")]
     #[link(name = "iconv")]
@@ -27,8 +27,8 @@ mod platform {
     #[link(name = "nvim")]
     #[link(name = "uv")]
     #[link(name = "msgpack")]
-    #[link(name = "termkey", kind = "static")]
-    #[link(name = "unibilium", kind = "static")]
+    #[link(name = "termkey")]
+    #[link(name = "unibilium")]
     #[link(name = "util")]
     extern{}
 }
