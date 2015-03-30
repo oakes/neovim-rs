@@ -24,11 +24,11 @@ mod platform {
 
 #[cfg(target_os="linux")]
 mod platform {
-    #[link(name = "nvim")]
-    #[link(name = "uv")]
-    #[link(name = "msgpack")]
-    #[link(name = "termkey")]
-    #[link(name = "unibilium")]
+    #[link(name = "nvim", kind = "static")]
+    #[link(name = "uv", kind = "static")]
+    #[link(name = "msgpack", kind = "static")]
+    #[link(name = "termkey", kind = "static")]
+    #[link(name = "unibilium", kind = "static")]
     #[link(name = "util")]
     extern{}
 }
