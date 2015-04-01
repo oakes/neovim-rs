@@ -16,6 +16,7 @@ mod platform {
     #[link(name = "msgpack", kind = "static")]
     #[link(name = "termkey", kind = "static")]
     #[link(name = "unibilium", kind = "static")]
+    #[link(name = "vterm", kind = "static")]
     #[link(name = "util")]
     #[link(name = "intl")]
     #[link(name = "iconv")]
@@ -29,6 +30,7 @@ mod platform {
     #[link(name = "msgpack", kind = "static")]
     #[link(name = "termkey", kind = "static")]
     #[link(name = "unibilium", kind = "static")]
+    #[link(name = "vterm", kind = "static")]
     #[link(name = "util")]
     extern{}
 }
