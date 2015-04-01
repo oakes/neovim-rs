@@ -201,7 +201,7 @@ impl Array {
             // we need to copy the string into memory not managed by Rust,
             // so api_free_array can clear it
             let ptr = ffi::malloc(val.len() as u64);
-            ::std::ptr::copy(ptr, val.as_ptr() as *const ffi::c_void, val.len());
+            ::std::ptr::copy(ptr, val.as_ptr() as *mut ffi::c_void, val.len());
             let vim_str = ffi::C_String {data: ptr as *const i8, size: val.len() as u64};
             ffi::vim_array_add_string(vim_str, &mut self.value)
         }
