@@ -7,7 +7,7 @@ pub use libc::types::os::arch::c95::size_t;
 // misc types
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_msgpack_sbuffer {
     pub size: size_t,
     pub data: *const c_char,
@@ -15,13 +15,13 @@ pub struct C_msgpack_sbuffer {
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_KeyValuePair;
 
 // object container types
 
 #[repr(C)]
-#[derive(Clone, PartialEq, PartialOrd, Debug, Copy)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 pub enum ObjectType {
     BufferType,
     WindowType,
@@ -36,70 +36,70 @@ pub enum ObjectType {
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_Object {
     pub object_type: ObjectType,
     pub data: C_Array
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_Object_Buffer {
     pub object_type: ObjectType,
     pub data: C_Buffer
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_Object_Window {
     pub object_type: ObjectType,
     pub data: C_Window
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_Object_Tabpage {
     pub object_type: ObjectType,
     pub data: C_Tabpage
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_Object_Boolean {
     pub object_type: ObjectType,
     pub data: C_Boolean
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_Object_Integer {
     pub object_type: ObjectType,
     pub data: C_Integer
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_Object_Float {
     pub object_type: ObjectType,
     pub data: C_Float
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_Object_String {
     pub object_type: ObjectType,
     pub data: C_String
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_Object_Array {
     pub object_type: ObjectType,
     pub data: C_Array
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_Object_Dictionary {
     pub object_type: ObjectType,
     pub data: C_Dictionary
@@ -115,14 +115,14 @@ pub type C_Integer = int64_t;
 pub type C_Float = c_double;
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_String {
     pub data: *const c_char,
     pub size: size_t
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_Array {
     pub items: *mut C_Object,
     pub size: size_t,
@@ -130,7 +130,7 @@ pub struct C_Array {
 }
 
 #[repr(C)]
-#[derive(Copy)]
+#[derive(Clone, Copy)]
 pub struct C_Dictionary {
     pub items: *mut C_KeyValuePair,
     pub size: size_t,

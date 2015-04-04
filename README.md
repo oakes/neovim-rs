@@ -4,6 +4,8 @@ A library for embedding Neovim inside a Rust project.
 
 ## Build Instructions
 
+Note: Requires the nightly release of Rust due to the use of unstable features.
+
 ### Linux (apt-get)
 
 ```Shell

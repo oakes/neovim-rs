@@ -1,4 +1,4 @@
-#![feature(collections, convert, libc)]
+#![feature(collections, libc)]
 #![allow(raw_pointer_derive)]
 #![crate_name = "neovim"]
 #![crate_type = "lib"]
