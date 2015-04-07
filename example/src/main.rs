@@ -1,4 +1,4 @@
-#![feature(collections, convert, libc)]
+#![feature(collections, libc)]
 
 extern crate libc;
 extern crate neovim;
