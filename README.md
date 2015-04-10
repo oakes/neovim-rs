@@ -4,7 +4,9 @@ A library for embedding Neovim inside a Rust project.
 
 ## Build Instructions
 
-Note: Requires the nightly release of Rust due to the use of unstable features.
+Notes:
+* Requires the nightly release of Rust due to the use of unstable features.
+* If neovim fails to build, try going into the `neovim` directory and running `make libnvim` to get more specific errors.
 
 ### Linux (apt-get)
 
