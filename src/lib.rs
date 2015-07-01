@@ -1,4 +1,3 @@
-#![feature(collections, libc)]
 #![allow(raw_pointer_derive)]
 #![crate_name = "neovim"]
 #![crate_type = "lib"]
@@ -8,6 +7,7 @@ extern crate libc;
 
 use std::ffi::CString;
 use std::fmt;
+use std::slice;
 
 #[cfg(target_os="macos")]
 mod platform {
@@ -98,7 +98,7 @@ unsafe fn c_object_to_object(obj: *mut ffi::C_Object) -> Option<Object> {
             Some(Object::Float((*(obj as *mut ffi::C_Object_Float)).data)),
         ffi::ObjectType::StringType => {
             let vim_str: ffi::C_String = (*(obj as *mut ffi::C_Object_String)).data;
-            let v = Vec::from_raw_buf(vim_str.data as *const u8, vim_str.size as usize);
+            let v = slice::from_raw_parts(vim_str.data as *const u8, vim_str.size as usize).to_vec();
             Some(Object::String(String::from_utf8_unchecked(v)))
         },
         ffi::ObjectType::ArrayType =>
@@ -130,7 +130,7 @@ pub fn serialize_message(id: u64, method: &'static str, args: &Array) -> String 
         let buf = ffi::vim_msgpack_new();
         let vim_str = ffi::C_String {data: method.as_ptr() as *const i8, size: method.len() as u64};
         ffi::vim_serialize_request(id, vim_str, args.unwrap_value(), buf);
-        let v = Vec::from_raw_buf((*buf).data as *const u8, (*buf).size as usize);
+        let v = slice::from_raw_parts((*buf).data as *const u8, (*buf).size as usize).to_vec();
         ffi::vim_msgpack_free(buf);
         String::from_utf8_unchecked(v)
     }
