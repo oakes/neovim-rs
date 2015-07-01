@@ -9,7 +9,7 @@ license = "Unlicense"
 repository = "https://github.com/oakes/neovim-rs"
 
 [dependencies]
-libc="*"
+libc="^0"
 
 [lib]
 
