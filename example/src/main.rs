@@ -1,4 +1,4 @@
-#![feature(collections, libc)]
+#![feature(libc)]
 
 extern crate libc;
 extern crate neovim;
@@ -6,6 +6,7 @@ extern crate neovim;
 use std::io::Write;
 use std::fs::OpenOptions;
 use std::path::Path;
+use std::slice;
 use libc::{c_int, c_uchar, c_void};
 use libc::funcs::posix88::unistd::{pipe, read, write};
 use libc::types::os::arch::c95::size_t;
@@ -26,7 +27,7 @@ fn recv_message(fd: c_int) -> Option<neovim::Array> {
         return None;
     }
     unsafe {
-        let v = Vec::from_raw_buf(buf.as_ptr(), n as usize);
+        let v = slice::from_raw_parts(buf.as_ptr(), n as usize).to_vec();
         let s = String::from_utf8_unchecked(v);
         Some(neovim::deserialize_message(&s))
     }
