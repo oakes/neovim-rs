@@ -8,6 +8,9 @@ description = "A library for embedding Neovim inside a Rust project"
 license = "Unlicense"
 repository = "https://github.com/oakes/neovim-rs"
 
+[dependencies]
+libc="^0"
+
 [lib]
 
 name = "neovim"
