@@ -7,3 +7,7 @@ authors = ["oakes <zsoakes@gmail.com>"]
 [dependencies.neovim-rs]
 
 path = "../"
+
+[dependencies.libc]
+
+Libc = "0.1.8"
