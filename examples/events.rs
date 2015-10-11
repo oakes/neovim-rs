@@ -1,3 +1,9 @@
+//! This example demonstrates how to use neovim-rs. It runs Neovim itself on the main thread, and
+//! launches a separate logging thread. The logging thread connects to Neovim over an anonymous
+//! pipe and asks to be notified of "bufenter" events (whenever you switch to a buffer). It then
+//! writes the messages it receives from Neovim to a file called events.log in the current
+//! directory. The purpose is to demonstrate how to use Neovim's msgpack-rpc protocol from Rust.
+
 extern crate libc;
 extern crate neovim;
 
