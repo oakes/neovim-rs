@@ -2,6 +2,8 @@
 
 A library for embedding Neovim inside a Rust project.
 
+Code in the `examples` directory can be run with `cargo run --example <example>`.
+
 ## Build Instructions
 
 Note: If neovim fails to build, try going into the `neovim` directory and running `make libnvim` to get more specific errors.
