@@ -22,6 +22,7 @@ pub struct C_KeyValuePair;
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
+#[allow(dead_code)]
 pub enum ObjectType {
     BufferType,
     WindowType,
