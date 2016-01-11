@@ -11,9 +11,7 @@ use std::io::Write;
 use std::fs::OpenOptions;
 use std::path::Path;
 use std::slice;
-use libc::{c_int, c_uchar, c_void};
-use libc::funcs::posix88::unistd::{pipe, read, write};
-use libc::types::os::arch::c95::size_t;
+use libc::{c_int, c_uchar, c_void, pipe, read, write, size_t};
 
 fn send_message(fd: c_int, command: &str) {
     let mut arr = neovim::Array::new();

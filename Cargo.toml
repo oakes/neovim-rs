@@ -1,5 +1,4 @@
 [package]
-
 name = "neovim-rs"
 version = "0.1.0"
 authors = ["oakes <zsoakes@gmail.com>"]
@@ -9,10 +8,9 @@ license = "Unlicense"
 repository = "https://github.com/oakes/neovim-rs"
 
 [dependencies]
-libc="0.1.*"
+libc="0.2"
 
 [lib]
-
 name = "neovim"
 crate_type = ["rlib"]
 path = "src/lib.rs"

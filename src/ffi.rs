@@ -1,8 +1,6 @@
 #![allow(non_camel_case_types)]
 
-pub use libc::{c_char, c_double, c_int, c_void, int64_t, uint64_t};
-pub use libc::funcs::c95::stdlib::malloc;
-pub use libc::types::os::arch::c95::size_t;
+pub use libc::{c_char, c_double, c_int, c_void, int64_t, uint64_t, malloc, size_t};
 
 // misc types
 
@@ -16,7 +14,10 @@ pub struct C_msgpack_sbuffer {
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct C_KeyValuePair;
+pub struct C_KeyValuePair {
+    pub key: C_String,
+    pub value: C_Object
+}
 
 // object container types
 

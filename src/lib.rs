@@ -128,7 +128,7 @@ pub fn channel_from_fds(read_fd: i32, write_fd: i32) -> u64 {
 pub fn serialize_message(id: u64, method: &'static str, args: &Array) -> String {
     unsafe {
         let buf = ffi::vim_msgpack_new();
-        let vim_str = ffi::C_String {data: method.as_ptr() as *const i8, size: method.len() as u64};
+        let vim_str = ffi::C_String {data: method.as_ptr() as *const i8, size: method.len() as usize};
         ffi::vim_serialize_request(id, vim_str, args.unwrap_value(), buf);
         let v = slice::from_raw_parts((*buf).data as *const u8, (*buf).size as usize).to_vec();
         ffi::vim_msgpack_free(buf);
@@ -140,7 +140,7 @@ pub fn deserialize_message(message: &String) -> Array {
     let message_ref: &str = message.as_ref();
     let s = ffi::C_String {
         data: message_ref.as_ptr() as *const i8,
-        size: message.len() as u64
+        size: message.len() as usize
     };
     let mut arr_raw = ffi::C_Array {
         items: ::std::ptr::null_mut(),
@@ -200,9 +200,9 @@ impl Array {
         unsafe {
             // we need to copy the string into memory not managed by Rust,
             // so api_free_array can clear it
-            let ptr = ffi::malloc(val.len() as u64);
+            let ptr = ffi::malloc(val.len() as usize);
             ::std::ptr::copy(val.as_ptr() as *const ffi::c_void, ptr, val.len());
-            let vim_str = ffi::C_String {data: ptr as *const i8, size: val.len() as u64};
+            let vim_str = ffi::C_String {data: ptr as *const i8, size: val.len() as usize};
             ffi::vim_array_add_string(vim_str, &mut self.value)
         }
     }
@@ -215,14 +215,14 @@ impl Array {
         unsafe { ffi::vim_array_add_dictionary(val, &mut self.value) }
     }
 
-    pub fn get(&self, index: u64) -> Option<Object> {
+    pub fn get(&self, index: usize) -> Option<Object> {
         if index >= self.len() {
             return None;
         }
         unsafe { c_object_to_object(self.value.items.offset(index as isize)) }
     }
 
-    pub fn len(&self) -> u64 {
+    pub fn len(&self) -> usize {
         self.value.size
     }
 
