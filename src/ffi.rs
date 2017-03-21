@@ -146,9 +146,6 @@ extern "C" {
     pub fn nvim_main_setup (argc: c_int, argv: *const *const c_char) -> c_int;
     pub fn nvim_main_loop () -> c_int;
     pub fn api_free_array (arr: C_Array);
-    pub fn vim_array_add_buffer (val: C_Buffer, arr: *mut C_Array);
-    pub fn vim_array_add_window (val: C_Window, arr: *mut C_Array);
-    pub fn vim_array_add_tabpage (val: C_Tabpage, arr: *mut C_Array);
     pub fn vim_array_add_nil (arr: *mut C_Array);
     pub fn vim_array_add_boolean (val: C_Boolean, arr: *mut C_Array);
     pub fn vim_array_add_integer (val: C_Integer, arr: *mut C_Array);

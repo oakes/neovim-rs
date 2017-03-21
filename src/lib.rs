@@ -1,4 +1,3 @@
-#![allow(raw_pointer_derive)]
 #![crate_name = "neovim"]
 #![crate_type = "lib"]
 #![crate_type = "rlib"]
@@ -166,18 +165,6 @@ impl Array {
             },
             is_owned: true
         }
-    }
-
-    pub fn add_buffer(&mut self, val: ffi::C_Buffer) {
-        unsafe { ffi::vim_array_add_buffer(val, &mut self.value) }
-    }
-
-    pub fn add_window(&mut self, val: ffi::C_Window) {
-        unsafe { ffi::vim_array_add_window(val, &mut self.value) }
-    }
-
-    pub fn add_tabpage(&mut self, val: ffi::C_Tabpage) {
-        unsafe { ffi::vim_array_add_tabpage(val, &mut self.value) }
     }
 
     pub fn add_nil(&mut self) {
