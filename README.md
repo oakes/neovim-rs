@@ -29,7 +29,7 @@ brew install libtool automake cmake pkg-config gettext
 cargo build
 ```
 
-## Windows
+### Windows
 
 Prebuilt binaries are already in the `neovim-windows` dir, so neovim will not need to be built.
 
