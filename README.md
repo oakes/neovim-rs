@@ -2,7 +2,7 @@
 
 A library for embedding Neovim inside a Rust project.
 
-Code in the `examples` directory can be run with `cargo run --example <example>`.
+The example can be run with `cargo run --example events`. It will launch neovim, and every time you open a buffer it will save the event to `events.log`.
 
 ## Build Instructions
 
@@ -28,6 +28,10 @@ cargo build
 brew install libtool automake cmake pkg-config gettext
 cargo build
 ```
+
+## Windows
+
+Prebuilt binaries are already in the `neovim-windows` dir, so all you have to do is `cargo build`.
 
 ## Licensing
 
