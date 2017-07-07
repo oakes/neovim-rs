@@ -12,10 +12,11 @@ use std::slice;
 mod platform {
     #[link(name = "nvim", kind = "static")]
     #[link(name = "uv", kind = "static")]
-    #[link(name = "msgpack", kind = "static")]
+    #[link(name = "msgpackc", kind = "static")]
     #[link(name = "termkey", kind = "static")]
     #[link(name = "unibilium", kind = "static")]
     #[link(name = "vterm", kind = "static")]
+    #[link(name = "luajit-5.1", kind = "static")]
     #[link(name = "util")]
     #[link(name = "intl")]
     #[link(name = "iconv")]
@@ -26,10 +27,11 @@ mod platform {
 mod platform {
     #[link(name = "nvim", kind = "static")]
     #[link(name = "uv", kind = "static")]
-    #[link(name = "msgpack", kind = "static")]
+    #[link(name = "msgpackc", kind = "static")]
     #[link(name = "termkey", kind = "static")]
     #[link(name = "unibilium", kind = "static")]
     #[link(name = "vterm", kind = "static")]
+    #[link(name = "luajit-5.1", kind = "static")]
     #[link(name = "util")]
     extern{}
 }
