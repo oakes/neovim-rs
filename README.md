@@ -31,7 +31,12 @@ cargo build
 
 ## Windows
 
-Prebuilt binaries are already in the `neovim-windows` dir, so all you have to do is `cargo build`.
+Prebuilt binaries are already in the `neovim-windows` dir, so neovim will not need to be built. You will, however, need to install the `rustup install stable-gnu`.
+
+```Shell
+set RUSTUP_TOOLCHAIN=stable-x86_64-pc-windows-gnu
+cargo build
+```
 
 ## Licensing
 
