@@ -11,7 +11,11 @@ use std::io::Write;
 use std::fs::OpenOptions;
 use std::path::Path;
 use std::slice;
-use libc::{c_int, c_uchar, c_void, pipe, read, write, size_t};
+use libc::{c_int, c_uchar, c_void, pipe, read, write};
+#[cfg(target_os="windows")]
+use libc::{c_uint, O_BINARY};
+#[cfg(not(target_os="windows"))]
+use libc::size_t;
 
 fn send_message(fd: c_int, command: &str) {
     let mut arr = neovim::Array::new();
@@ -19,13 +23,17 @@ fn send_message(fd: c_int, command: &str) {
     let msg = neovim::serialize_message(1, "vim_command", &arr);
     let msg_ref: &str = msg.as_ref();
     let msg_ptr = msg_ref.as_ptr() as *const c_void;
-    unsafe { write(fd, msg_ptr, msg.len() as size_t) };
+    #[cfg(target_os="windows")]
+    let len = msg.len() as c_uint;
+    #[cfg(not(target_os="windows"))]
+    let len = msg.len() as size_t;
+    unsafe { write(fd, msg_ptr, len) };
 }
 
 fn recv_message(fd: c_int) -> Option<neovim::Array> {
     let mut buf : [c_uchar; 1024] = [0; 1024];
     let n = unsafe { read(fd, buf.as_mut_ptr() as *mut c_void, 1024) };
-    if n < 0 {
+    if n <= 0 {
         return None;
     }
     unsafe {
@@ -40,7 +48,14 @@ fn main() {
     let mut nvim_log : [c_int; 2] = [0; 2]; // to nvim from logger
     let mut log_nvim : [c_int; 2] = [0; 2]; // to logger from nvim
     unsafe {
+        #[cfg(target_os="windows")]
+        pipe(nvim_log.as_mut_ptr(), 2048, O_BINARY);
+        #[cfg(not(target_os="windows"))]
         pipe(nvim_log.as_mut_ptr());
+
+        #[cfg(target_os="windows")]
+        pipe(log_nvim.as_mut_ptr(), 2048, O_BINARY);
+        #[cfg(not(target_os="windows"))]
         pipe(log_nvim.as_mut_ptr());
     };
 
@@ -66,7 +81,7 @@ fn main() {
     });
 
     // start nvim
-    let args : Vec<String> = ::std::env::args().collect();
+    let args : Vec<String> = vec!["events".to_string(), "-u".to_string(), "NONE".to_string()];
     neovim::main_setup(&args);
     neovim::channel_from_fds(nvim_log[0], log_nvim[1]);
     neovim::main_loop();

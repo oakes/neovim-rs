@@ -36,6 +36,24 @@ mod platform {
     extern{}
 }
 
+#[cfg(target_os="windows")]
+mod platform {
+    #[link(name = "nvim", kind = "static")]
+    #[link(name = "uv", kind = "static")]
+    #[link(name = "msgpackc", kind = "static")]
+    #[link(name = "termkey", kind = "static")]
+    #[link(name = "unibilium", kind = "static")]
+    #[link(name = "vterm", kind = "static")]
+    #[link(name = "luajit", kind = "static")]
+    #[link(name = "intl")]
+    #[link(name = "iconv")]
+    #[link(name = "psapi")]
+    #[link(name = "iphlpapi")]
+    #[link(name = "ole32")]
+    #[link(name = "uuid")]
+    extern{}
+}
+
 mod ffi;
 
 pub enum Object {
