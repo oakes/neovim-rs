@@ -12,10 +12,6 @@ use std::fs::OpenOptions;
 use std::path::Path;
 use std::slice;
 use libc::{c_int, c_uchar, c_void, pipe, read, write};
-#[cfg(target_os="windows")]
-use libc::{c_uint, O_BINARY};
-#[cfg(not(target_os="windows"))]
-use libc::size_t;
 
 fn send_message(fd: c_int, command: &str) {
     let mut arr = neovim::Array::new();
@@ -24,9 +20,9 @@ fn send_message(fd: c_int, command: &str) {
     let msg_ref: &str = msg.as_ref();
     let msg_ptr = msg_ref.as_ptr() as *const c_void;
     #[cfg(target_os="windows")]
-    let len = msg.len() as c_uint;
+    let len = msg.len() as libc::c_uint;
     #[cfg(not(target_os="windows"))]
-    let len = msg.len() as size_t;
+    let len = msg.len() as libc::size_t;
     unsafe { write(fd, msg_ptr, len) };
 }
 
@@ -49,12 +45,12 @@ fn main() {
     let mut log_nvim : [c_int; 2] = [0; 2]; // to logger from nvim
     unsafe {
         #[cfg(target_os="windows")]
-        pipe(nvim_log.as_mut_ptr(), 2048, O_BINARY);
+        pipe(nvim_log.as_mut_ptr(), 2048, libc::O_BINARY);
         #[cfg(not(target_os="windows"))]
         pipe(nvim_log.as_mut_ptr());
 
         #[cfg(target_os="windows")]
-        pipe(log_nvim.as_mut_ptr(), 2048, O_BINARY);
+        pipe(log_nvim.as_mut_ptr(), 2048, libc::O_BINARY);
         #[cfg(not(target_os="windows"))]
         pipe(log_nvim.as_mut_ptr());
     };
