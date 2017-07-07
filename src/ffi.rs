@@ -25,16 +25,16 @@ pub struct C_KeyValuePair {
 #[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 #[allow(dead_code)]
 pub enum ObjectType {
-    BufferType,
-    WindowType,
-    TabpageType,
     NilType,
     BooleanType,
     IntegerType,
     FloatType,
     StringType,
     ArrayType,
-    DictionaryType
+    DictionaryType,
+    BufferType,
+    WindowType,
+    TabpageType
 }
 
 #[repr(C)]
